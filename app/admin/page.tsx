@@ -1,10 +1,9 @@
-import AdminLoginModal from "@/components/AdminLoginModal"
-
 export default function Admin() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Admin</h1>
-      <AdminLoginModal />
+    <div className="rounded-lg border border-border p-6">
+      <p className="text-muted-foreground">
+        Select a section from the sidebar to manage content.
+      </p>
     </div>
   )
 }

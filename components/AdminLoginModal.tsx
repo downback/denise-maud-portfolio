@@ -28,8 +28,6 @@ export default function AdminLoginModal() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isOpen, setIsOpen] = useState(true)
   const [authError, setAuthError] = useState("")
   const [emailError, setEmailError] = useState("")
 
@@ -80,9 +78,8 @@ export default function AdminLoginModal() {
         throw new Error("You are not authorized as admin.")
       }
 
-      setIsAuthenticated(true)
-      setIsOpen(false)
       toast({ title: "Signed in", description: "Admin access granted." })
+      // Layout will handle hiding the modal via auth state listener
     } catch (error) {
       const fallbackMessage = "Login failed. Please check your credentials."
       const message =
@@ -106,25 +103,12 @@ export default function AdminLoginModal() {
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(nextOpen) => {
-        if (isAuthenticated) {
-          setIsOpen(nextOpen)
-        } else {
-          setIsOpen(true)
-        }
-      }}
-    >
+    <Dialog open={true} onOpenChange={() => {}}>
       <DialogContent
         className="sm:max-w-md"
         hideCloseButton
-        onInteractOutside={(event) => {
-          if (!isAuthenticated) event.preventDefault()
-        }}
-        onEscapeKeyDown={(event) => {
-          if (!isAuthenticated) event.preventDefault()
-        }}
+        onInteractOutside={(event) => event.preventDefault()}
+        onEscapeKeyDown={(event) => event.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>Admin Login</DialogTitle>
@@ -179,7 +163,10 @@ export default function AdminLoginModal() {
               id="admin-password"
               type="password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => {
+                setPassword(event.target.value)
+                if (authError) setAuthError("")
+              }}
               placeholder="••••••••"
             />
           </div>

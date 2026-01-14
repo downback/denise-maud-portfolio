@@ -59,9 +59,18 @@
   - [x] Contact - locate contents in the center
   - [x] mobile sidebar no hover effect
   - [x] sidebar refactor
-  - [ ] Works - loading animation
+  - [x ] Works - loading animation
   - [ ] admin ui start
+    - [x] admin sidebar
+    - [x] admin sub-header
+    - Dashboard
+      - [ ] recent activity (add new | delete | update + main page | works | Biography + date of admin activity)
+      - [ ] quick buttons for modal
+    - main page
+    - works
+    - Bio
   - [ ] admin db connect
+  - [ ] main image file name on supabase
   - [ ] Home - animation adjust
 
 - [ ] Implement shared public layout(s) matching existing design constraints
