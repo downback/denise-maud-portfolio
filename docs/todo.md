@@ -64,17 +64,16 @@
     - [x] admin sidebar
     - [x] admin sub-header
     - [x] add svg
-    - [ ] confirmation / alert modal
-    - [ ] edit modal
+    - [x] edit modal
     - Dashboard
       - [x] recent activity (add new | delete | update + main page | works | Biography + date of admin activity)
       - [x] quick buttons for modal
     - main page
-      - [ ] current image / change btn -> modal(image upload / animation check-box / preview + save btn) -> confirmation modal
+      - [x] current image / change btn -> modal(image upload / animation check-box / preview + save btn) -> confirmation modal
     - works
-      - [ ] add new work btn -> modal(select category / images upload / caption / preview & drag order + save btn) -> confirmation modal
+      - [x] add new work btn -> modal(select category / images upload / caption / preview & drag order + save btn) -> confirmation modal
     - Bio
-      - [ ] add new info btn -> modal(select category / text + save btn) -> confirmation modal
+      - [x] add new info btn -> modal(select category / text + save btn) -> confirmation modal
   - [ ] admin db connect
   - [ ] main image file name on supabase
   - [ ] Home - animation adjust

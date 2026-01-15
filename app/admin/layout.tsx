@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useMemo, type ReactNode } from "react"
 import { supabaseBrowser } from "@/lib/client"
-import AdminSidebar from "@/components/AdminSidebar"
-import AdminLoginModal from "@/components/AdminLoginModal"
-import AdminPageHeader from "@/components/AdminPageHeader"
+import AdminSidebar from "@/components/admin/AdminSidebar"
+import AdminLoginModal from "@/components/admin/AdminLoginModal"
+import AdminPageHeader from "@/components/admin/AdminPageHeader"
 import Loading from "@/components/Loading"
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

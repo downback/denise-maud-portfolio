@@ -40,7 +40,7 @@ export default function AdminPageHeader() {
   const config = pageConfigs[pathname] || pageConfigs["/admin"]
 
   return (
-    <div className="flex items-start justify-between gap-4 pb-6 border-b border-border">
+    <div className="flex items-end justify-between gap-4 pb-6 border-b border-border">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">{config.title}</h1>
         <p className="text-sm text-muted-foreground">{config.description}</p>

@@ -1,12 +1,22 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import AdminUploadModal from "@/components/admin/AdminUploadModal"
 
 export default function AdminMainImagePreviewPanel() {
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Current Image on the Main Page</CardTitle>
-        <Button type="button" variant="highlight">
+        <Button
+          type="button"
+          variant="highlight"
+          onClick={() => setIsUploadOpen(true)}
+        >
           <span className="hidden md:inline">Change image</span>
           <span className="md:hidden">Change</span>
         </Button>
@@ -25,6 +35,15 @@ export default function AdminMainImagePreviewPanel() {
           <div className="aspect-9/16 w-full md:h-fit rounded-md border border-dashed border-border bg-muted/30" />
         </div>
       </CardContent>
+      <AdminUploadModal
+        open={isUploadOpen}
+        onOpenChange={setIsUploadOpen}
+        title="Update hero image"
+        description="Upload a new hero image or update the supporting text."
+        showImageUpload
+        showTextInput={false}
+        showFileUpload={false}
+      />
     </Card>
   )
 }

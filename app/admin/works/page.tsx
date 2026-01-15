@@ -1,4 +1,4 @@
-import AdminWorksPdfPanel from "@/components/AdminWorksPdfPanel"
+import AdminWorksPdfPanel from "@/components/admin/AdminWorksPdfPanel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function AdminWorks() {

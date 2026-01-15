@@ -1,4 +1,4 @@
-import AdminMainImagePreviewPanel from "@/components/AdminMainImagePreviewPanel"
+import AdminMainImagePreviewPanel from "@/components/admin/AdminMainImagePreviewPanel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function AdminMainPage() {

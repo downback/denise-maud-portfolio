@@ -1,4 +1,8 @@
+"use client"
+
+import { useState } from "react"
 import { Pencil, Plus, Trash2 } from "lucide-react"
+import AdminUploadModal from "@/components/admin/AdminUploadModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -16,6 +20,8 @@ export default function AdminBioSectionPanel({
   title,
   items,
 }: AdminBioSectionPanelProps) {
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -59,11 +65,21 @@ export default function AdminBioSectionPanel({
           type="button"
           className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
           aria-label={`Add new detail in ${title.replace(" Information", "")}`}
+          onClick={() => setIsUploadOpen(true)}
         >
           <Plus className="h-4 w-4" />
           <span>Add new detail in {title.replace(" Information", "")}</span>
         </button>
       </CardContent>
+      <AdminUploadModal
+        open={isUploadOpen}
+        onOpenChange={setIsUploadOpen}
+        title={`Add ${title.replace(" Information", "")} detail`}
+        description="Add or update biography text details."
+        showImageUpload={false}
+        showFileUpload={false}
+        showTextInput
+      />
     </Card>
   )
 }
