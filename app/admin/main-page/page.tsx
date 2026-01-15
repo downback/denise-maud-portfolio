@@ -12,13 +12,17 @@ export default function AdminMainPage() {
             Image Guidelines
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            Use high-resolution images for best quality (minimum 1920px wide).
-          </p>
-          <p>The image will be displayed in a 21:9 aspect ratio on desktop.</p>
-          <p>On mobile, the image will be cropped to fit a 16:9 ratio.</p>
-          <p>Avoid placing important elements at the edges.</p>
+        <CardContent className="text-sm text-muted-foreground">
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              Use high-resolution images for best quality (minimum 1920px wide).
+            </li>
+            <li>
+              The image will be displayed in a 21:9 aspect ratio on desktop.
+            </li>
+            <li>On mobile, the image will be cropped to fit a 16:9 ratio.</li>
+            <li>Avoid placing important elements at the edges.</li>
+          </ul>
         </CardContent>
       </Card>
     </div>
