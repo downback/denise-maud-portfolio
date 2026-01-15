@@ -8,7 +8,15 @@ import AdminPageHeader from "@/components/AdminPageHeader"
 import Loading from "@/components/Loading"
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const supabase = useMemo(() => supabaseBrowser(), [])
+  const supabase = useMemo(() => {
+    console.log("🔧 Initializing Supabase client...")
+    console.log("📍 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log(
+      "🔑 Supabase Key:",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Missing"
+    )
+    return supabaseBrowser()
+  }, [])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -16,14 +24,35 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     let mounted = true
 
     async function checkAuth() {
+      console.log("🔍 Starting auth check...")
+
+      // Add timeout to prevent infinite hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () => reject(new Error("Auth check timeout after 10 seconds")),
+          10000
+        )
+      })
+
       try {
+        console.log("📡 Fetching session...")
+        const result = (await Promise.race([
+          supabase.auth.getSession(),
+          timeoutPromise,
+        ])) as Awaited<ReturnType<typeof supabase.auth.getSession>>
+
         const {
           data: { session },
           error: sessionError,
-        } = await supabase.auth.getSession()
+        } = result
+
+        console.log("✅ Session response:", {
+          session: !!session,
+          error: sessionError,
+        })
 
         if (sessionError) {
-          console.error("Session error:", sessionError)
+          console.error("❌ Session error:", sessionError)
           if (mounted) {
             setIsAuthenticated(false)
             setIsLoading(false)
@@ -32,6 +61,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         }
 
         if (!session) {
+          console.log("❌ No session found")
           if (mounted) {
             setIsAuthenticated(false)
             setIsLoading(false)
@@ -40,16 +70,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         }
 
         const userId = session.user.id
+        console.log("👤 User ID:", userId)
 
         // Check if user is admin
+        console.log("🔍 Checking admin status...")
         const { data: adminRow, error: adminError } = await supabase
           .from("app_admin")
           .select("admin_user_id")
           .eq("singleton_id", true)
           .maybeSingle()
 
+        console.log("✅ Admin check response:", { adminRow, error: adminError })
+
         if (adminError) {
-          console.error("Admin check error:", adminError)
+          console.error("❌ Admin check error:", adminError)
           if (mounted) {
             setIsAuthenticated(false)
             setIsLoading(false)
@@ -58,11 +92,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         }
 
         if (adminRow && adminRow.admin_user_id === userId) {
+          console.log("✅ User is admin!")
           if (mounted) {
             setIsAuthenticated(true)
             setIsLoading(false)
           }
         } else {
+          console.log("❌ User is not admin, signing out...")
           // Not admin, sign out
           await supabase.auth.signOut()
           if (mounted) {
@@ -71,12 +107,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           }
         }
       } catch (error) {
-        console.error("Auth check failed:", error)
+        console.error("💥 Auth check failed:", error)
         if (mounted) {
           setIsAuthenticated(false)
           setIsLoading(false)
         }
       }
+
+      console.log("🏁 Auth check completed")
     }
 
     checkAuth()

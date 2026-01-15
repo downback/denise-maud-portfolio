@@ -3,17 +3,25 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, LogOut } from "lucide-react"
+import {
+  Menu,
+  X,
+  LogOut,
+  LayoutDashboard,
+  Image,
+  FolderOpen,
+  UserCircle,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { supabaseBrowser } from "@/lib/client"
 import { useToast } from "@/components/ui/use-toast"
 
 const adminNavLinks = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/main-page", label: "Main Page" },
-  { href: "/admin/works", label: "Works" },
-  { href: "/admin/biography", label: "Biography" },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/main-page", label: "Main Page", icon: Image },
+  { href: "/admin/works", label: "Works", icon: FolderOpen },
+  { href: "/admin/biography", label: "Biography", icon: UserCircle },
 ]
 
 export default function AdminSidebar() {
@@ -55,20 +63,24 @@ export default function AdminSidebar() {
         </div>
         <nav className="flex-1 flex flex-col px-4 py-4">
           <div className="space-y-1">
-            {adminNavLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "block px-3 py-2 text-sm font-light rounded-md transition-colors",
-                  pathname === link.href
-                    ? "bg-secondary text-secondary-foreground"
-                    : "hover:bg-secondary/50"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {adminNavLinks.map((link) => {
+              const Icon = link.icon
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 text-sm font-light rounded-md transition-colors",
+                    pathname === link.href
+                      ? "bg-secondary text-secondary-foreground"
+                      : "hover:bg-secondary/50"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
           <div className="mt-auto pt-4 border-t border-border">
             <Button
@@ -119,21 +131,25 @@ export default function AdminSidebar() {
             </div>
             <nav className="flex-1 flex flex-col px-4 py-4">
               <div className="space-y-1">
-                {adminNavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={closeMobileNav}
-                    className={cn(
-                      "block px-3 py-2 text-sm font-light rounded-md transition-colors",
-                      pathname === link.href
-                        ? "bg-secondary text-secondary-foreground"
-                        : "hover:bg-secondary/50"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {adminNavLinks.map((link) => {
+                  const Icon = link.icon
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={closeMobileNav}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm font-light rounded-md transition-colors",
+                        pathname === link.href
+                          ? "bg-secondary text-secondary-foreground"
+                          : "hover:bg-secondary/50"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {link.label}
+                    </Link>
+                  )
+                })}
               </div>
               <div className="mt-auto pt-4 border-t border-border">
                 <Button
