@@ -67,8 +67,8 @@
     - [ ] confirmation / alert modal
     - [ ] edit modal
     - Dashboard
-      - [ ] recent activity (add new | delete | update + main page | works | Biography + date of admin activity)
-      - [ ] quick buttons for modal
+      - [x] recent activity (add new | delete | update + main page | works | Biography + date of admin activity)
+      - [x] quick buttons for modal
     - main page
       - [ ] current image / change btn -> modal(image upload / animation check-box / preview + save btn) -> confirmation modal
     - works

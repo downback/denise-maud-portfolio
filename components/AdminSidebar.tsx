@@ -57,7 +57,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-64 md:shrink-0 md:border-r md:border-border md:h-screen">
+      <aside className="hidden md:fixed md:left-0 md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-r md:border-border">
         <div className="px-6 py-6 border-b border-border">
           <h1 className="text-xl font-semibold">admin</h1>
         </div>
@@ -97,7 +97,7 @@ export default function AdminSidebar() {
       </aside>
 
       {/* Mobile Header */}
-      <header className="flex md:hidden items-center justify-start md:justify-between border-b border-border px-4 py-3 bg-white">
+      <header className="fixed left-0 right-0 top-0 z-40 flex md:hidden items-center justify-start md:justify-between border-b border-border bg-white px-4 py-3">
         <Button
           variant="ghost"
           size="icon"
