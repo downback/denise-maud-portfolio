@@ -78,12 +78,12 @@
   - [ ] main image file name on supabase
   - [ ] Home - animation adjust
 
-- [ ] Implement shared public layout(s) matching existing design constraints
-- [ ] Implement Supabase server-side reads for:
+- [ ] Implement Supabase server-side with admin page
 
-  - [ ] Hero media metadata
-  - [ ] Works PDF metadata
-  - [ ] Bio content fields
+  - [ ] Dashboard
+  - [ ] main page
+  - [ ] works
+  - [ ] bio
 
 - [ ] Implement caching strategy to ensure “immediate reflection” (no stale content)
 - [ ] Home: render hero media (image or looped video) based on metadata

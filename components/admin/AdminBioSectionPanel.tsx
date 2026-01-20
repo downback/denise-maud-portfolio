@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Pencil, Plus, Trash2 } from "lucide-react"
-import AdminUploadModal from "@/components/admin/AdminUploadModal"
+import BioUploadModal from "@/components/admin/BioUploadModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -71,14 +71,11 @@ export default function AdminBioSectionPanel({
           <span>Add new detail in {title.replace(" Information", "")}</span>
         </button>
       </CardContent>
-      <AdminUploadModal
+      <BioUploadModal
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
         title={`Add ${title.replace(" Information", "")} detail`}
         description="Add or update biography text details."
-        showImageUpload={false}
-        showFileUpload={false}
-        showTextInput
       />
     </Card>
   )

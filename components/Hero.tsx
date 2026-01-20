@@ -12,23 +12,76 @@ type HeroProps = {
 
 export default function Hero({ alt = "Hero image" }: HeroProps) {
   const supabase = useMemo(() => supabaseBrowser(), [])
+  const bucketName = "site-assets"
 
   // Fetcher function for SWR
   const fetcher = async () => {
-    const { data } = supabase.storage
-      .from("site-assets")
-      .getPublicUrl("hero/main_image.png")
+    const { data: siteContent, error: siteContentError } = await supabase
+      .from("site_content")
+      .select("hero_asset_id, updated_at")
+      .eq("singleton_id", true)
+      .maybeSingle()
 
-    return data?.publicUrl || "/hero-image.jpg"
+    if (siteContentError) {
+      return null
+    }
+
+    if (siteContent?.hero_asset_id) {
+      const { data: asset, error: assetError } = await supabase
+        .from("assets")
+        .select("path")
+        .eq("id", siteContent.hero_asset_id)
+        .maybeSingle()
+
+      if (assetError || !asset?.path) {
+        return null
+      }
+
+      const { data } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(asset.path)
+
+      const versionTag = siteContent.updated_at
+        ? `?v=${encodeURIComponent(siteContent.updated_at)}`
+        : ""
+
+      return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
+    }
+
+    const { data: fallbackAsset, error: fallbackError } = await supabase
+      .from("assets")
+      .select("path, created_at")
+      .eq("asset_kind", "hero_media")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (fallbackError || !fallbackAsset?.path) {
+      return null
+    }
+
+    const { data } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(fallbackAsset.path)
+
+    const versionTag = fallbackAsset.created_at
+      ? `?v=${encodeURIComponent(fallbackAsset.created_at)}`
+      : ""
+
+    return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
   }
 
   // Use SWR with aggressive caching
-  const { data: imageUrl, isLoading } = useSWR("hero-image", fetcher, {
+  const { data: imageUrl, isLoading } = useSWR<string | null>(
+    "hero-image",
+    fetcher,
+    {
     revalidateOnFocus: false, // Don't refetch on window focus
     revalidateOnReconnect: false, // Don't refetch on reconnect
     dedupingInterval: 3600000, // Dedupe requests within 1 hour
-    fallbackData: "/hero-image.jpg", // Instant fallback
-  })
+      fallbackData: null,
+    }
+  )
 
   if (isLoading) {
     return (
@@ -42,15 +95,21 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     <div className="fixed inset-0 md:relative -z-10">
       <div className="flex items-center justify-center w-full min-h-screen md:min-h-auto">
         <div className="hero-float w-[80vw] h-auto md:w-auto md:h-[70vh]">
-          <Image
-            src={imageUrl}
-            alt={alt}
-            width={1920}
-            height={1080}
-            className="w-full h-auto md:w-auto md:h-full object-contain"
-            priority
-            sizes="(max-width: 768px) 80vw, 70vh"
-          />
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={alt}
+              width={1920}
+              height={1080}
+              className="w-full h-auto md:w-auto md:h-full object-contain"
+              priority
+              sizes="(max-width: 768px) 80vw, 70vh"
+            />
+          ) : (
+            <div className="flex h-[60vh] w-full items-center justify-center rounded-xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
+              No hero image available
+            </div>
+          )}
         </div>
       </div>
     </div>
