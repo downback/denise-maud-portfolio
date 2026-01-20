@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,14 +12,19 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+
+type BioFormValues = {
+  year: string
+  title: string
+  location: string
+}
 
 type BioUploadModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   title?: string
   description?: string
-  onConfirm?: () => void
+  onConfirm?: (values: BioFormValues) => void
   confirmLabel?: string
   isConfirmDisabled?: boolean
   isSubmitting?: boolean
@@ -36,8 +42,35 @@ export default function BioUploadModal({
   isSubmitting = false,
   errorMessage,
 }: BioUploadModalProps) {
+  const [year, setYear] = useState("")
+  const [titleValue, setTitleValue] = useState("")
+  const [locationValue, setLocationValue] = useState("")
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setYear("")
+      setTitleValue("")
+      setLocationValue("")
+    }
+
+    onOpenChange(nextOpen)
+  }
+
+  const handleConfirm = () => {
+    onConfirm?.({
+      year: year.trim(),
+      title: titleValue.trim(),
+      location: locationValue.trim(),
+    })
+  }
+
+  const hasRequiredValues =
+    year.trim().length > 0 &&
+    titleValue.trim().length > 0 &&
+    locationValue.trim().length > 0
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md md:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -46,18 +79,29 @@ export default function BioUploadModal({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="upload-year">Select Year</Label>
+            <Label htmlFor="upload-year">Year</Label>
             <Input
               id="upload-year"
               type="text"
               placeholder="Year (e.g., 2024)"
+              value={year}
+              onChange={(event) => setYear(event.target.value)}
             />
-            <Label htmlFor="upload-text">Show Information</Label>
-            <Textarea
-              id="upload-text"
-              placeholder="Show title, Location, Description..."
-              rows={1}
-              className="min-h-[40px]"
+            <Label htmlFor="upload-title">Title</Label>
+            <Input
+              id="upload-title"
+              type="text"
+              placeholder="Show title"
+              value={titleValue}
+              onChange={(event) => setTitleValue(event.target.value)}
+            />
+            <Label htmlFor="upload-location">Location</Label>
+            <Input
+              id="upload-location"
+              type="text"
+              placeholder="Location"
+              value={locationValue}
+              onChange={(event) => setLocationValue(event.target.value)}
             />
           </div>
         </div>
@@ -69,15 +113,15 @@ export default function BioUploadModal({
           <Button
             type="button"
             variant="secondary"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
           >
             Dismiss
           </Button>
           <Button
             type="button"
             variant="highlight"
-            onClick={onConfirm}
-            disabled={isConfirmDisabled || isSubmitting}
+            onClick={handleConfirm}
+            disabled={!hasRequiredValues || isConfirmDisabled || isSubmitting}
           >
             {isSubmitting ? "Saving..." : confirmLabel}
           </Button>

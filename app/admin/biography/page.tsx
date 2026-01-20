@@ -1,39 +1,46 @@
 import AdminBioSectionPanel from "@/components/admin/AdminBioSectionPanel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { supabaseServer } from "@/lib/server"
 
-const soloShows = [
-  {
-    year: "2024",
-    description: "Tidal Notations, Glasshouse, Brooklyn, NY",
-  },
-  {
-    year: "2022",
-    description: "Holding Patterns, Drift Gallery, Los Angeles, CA",
-  },
-]
+const formatBioItems = (
+  rows: { id: string; title: string; location: string; year: number }[]
+) =>
+  rows.map((row) => ({
+    id: row.id,
+    year: String(row.year),
+    description: `${row.title}, ${row.location}`,
+  }))
 
-const selectedGroupShows = [
-  {
-    year: "2025",
-    description: "Surface/Depth, Assembly Room, New York, NY",
-  },
-  {
-    year: "2024",
-    description: "Signals, ICA Boston (project room), Boston, MA",
-  },
-]
+export default async function AdminBiography() {
+  const supabase = await supabaseServer()
+  const [{ data: soloRows }, { data: groupRows }] = await Promise.all([
+    supabase
+      .from("bio_solo_shows")
+      .select("id, title, location, year")
+      .order("sort_order", { ascending: true })
+      .order("year", { ascending: false }),
+    supabase
+      .from("bio_group_shows")
+      .select("id, title, location, year")
+      .order("sort_order", { ascending: true })
+      .order("year", { ascending: false }),
+  ])
 
-export default function AdminBiography() {
+  const soloShows = formatBioItems(soloRows ?? [])
+  const selectedGroupShows = formatBioItems(groupRows ?? [])
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 xl:grid-cols-2">
         <AdminBioSectionPanel
           title="Solo Shows Information"
           items={soloShows}
+          kind="solo"
         />
         <AdminBioSectionPanel
           title="Selected Group Shows Information"
           items={selectedGroupShows}
+          kind="group"
         />
       </div>
       <Card className="border-0 bg-muted shadow-none">

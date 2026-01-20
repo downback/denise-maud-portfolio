@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react"
 import BioUploadModal from "@/components/admin/BioUploadModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type BioItem = {
+  id?: string
   year: string
   description: string
 }
@@ -14,32 +15,159 @@ type BioItem = {
 type AdminBioSectionPanelProps = {
   title: string
   items: BioItem[]
+  kind: "solo" | "group"
 }
 
 export default function AdminBioSectionPanel({
   title,
   items,
+  kind,
 }: AdminBioSectionPanelProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [currentItems, setCurrentItems] = useState(items)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+
+  const handleCreate = async (values: {
+    year: string
+    title: string
+    location: string
+  }) => {
+    const parsedYear = Number(values.year)
+
+    if (!Number.isInteger(parsedYear)) {
+      setErrorMessage("Year must be a number.")
+      return
+    }
+
+    if (parsedYear < 1900 || parsedYear > 2100) {
+      setErrorMessage("Year must be between 1900 and 2100.")
+      return
+    }
+
+    setIsSubmitting(true)
+    setErrorMessage("")
+
+    try {
+      const response = await fetch(`/api/admin/bio/${kind}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: values.title,
+          location: values.location,
+          year: parsedYear,
+        }),
+      })
+
+      const payload = (await response.json()) as {
+        id?: string
+        year?: number
+        title?: string
+        location?: string
+        error?: string
+      }
+
+      if (!response.ok) {
+        setErrorMessage(payload.error || "Unable to add bio entry.")
+        return
+      }
+
+      const nextYear = payload.year ?? parsedYear
+      const nextTitle = payload.title ?? values.title
+      const nextLocation = payload.location ?? values.location
+      const nextDescription = `${nextTitle}, ${nextLocation}`
+
+      setCurrentItems((prevItems) => [
+        { id: payload.id, year: String(nextYear), description: nextDescription },
+        ...prevItems,
+      ])
+      setIsUploadOpen(false)
+    } catch (error) {
+      console.error("Failed to create bio entry", { error })
+      setErrorMessage("Unable to add bio entry. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const persistOrder = async (nextItems: BioItem[]) => {
+    const payload = nextItems
+      .map((item, index) => ({ id: item.id, sort_order: index }))
+      .filter((item) => item.id)
+
+    if (payload.length === 0) return
+
+    try {
+      const response = await fetch(`/api/admin/bio/${kind}/reorder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: payload }),
+      })
+
+      const result = (await response.json()) as { error?: string }
+
+      if (!response.ok) {
+        setErrorMessage(result.error || "Unable to save order.")
+      }
+    } catch (error) {
+      console.error("Failed to save bio order", { error })
+      setErrorMessage("Unable to save order. Please try again.")
+    }
+  }
+
+  const moveItem = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+    setCurrentItems((prevItems) => {
+      const nextItems = [...prevItems]
+      const [moved] = nextItems.splice(fromIndex, 1)
+      nextItems.splice(toIndex, 0, moved)
+      persistOrder(nextItems)
+      return nextItems
+    })
+  }
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {items.map((item, index) => (
+      <CardContent className="space-y-3 md:space-y-4 ">
+        
+        {currentItems.map((item, index) => (
           <div
             key={`${item.year}-${item.description}-${index}`}
-            className="flex flex-row gap-3 border-b border-border pb-4 last:border-b-0 last:pb-0 md:items-center justify-between"
+            className={`flex flex-row gap-3 border-b border-border pb-3 md:pb-4 last:border-b-0 first:border-t first:border-border first:pt-3 md:first:pt-4 last:pb-0 md:items-center justify-between ${
+              dragOverIndex === index ? "bg-muted/40" : ""
+            }`}
+            draggable
+            onDragStart={() => setDraggedIndex(index)}
+            onDragOver={(event) => {
+              event.preventDefault()
+              setDragOverIndex(index)
+            }}
+            onDragLeave={() => setDragOverIndex(null)}
+            onDrop={() => {
+              if (draggedIndex !== null) {
+                moveItem(draggedIndex, index)
+              }
+              setDraggedIndex(null)
+              setDragOverIndex(null)
+            }}
           >
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">
-                {item.year}
-              </p>
-              <p className="text-sm">{item.description}</p>
+            <div className="flex flex-row gap-4 md:gap-6 items-center">
+            <div className="flex items-center text-muted-foreground">
+              <GripVertical className="h-4 w-4" />
             </div>
-            <div className="flex gap-2">
+            <div className="space-x-2 md:space-x-3">
+              <span className="text-sm font-medium">
+                {item.year}
+              </span>
+              <span className="text-sm">{item.description}</span>
+            </div>
+            </div>
+            <div className="flex gap-0 md:gap-2 items-center">
               <Button
                 type="button"
                 variant="default"
@@ -47,7 +175,7 @@ export default function AdminBioSectionPanel({
                 aria-label="Edit"
                 className="shadow-none"
               >
-                <Pencil className="h-4 w-4 hover:text-zinc-400" />
+                <Pencil className="h-3 w-3 md:h-4 md:w-4 hover:text-zinc-400" />
               </Button>
               <Button
                 type="button"
@@ -56,11 +184,14 @@ export default function AdminBioSectionPanel({
                 aria-label="Delete"
                 className="shadow-none"
               >
-                <Trash2 className="h-4 w-4 text-red-500 hover:text-red-300" />
+                <Trash2 className="h-3 w-3 md:h-4 md:w-4 text-red-500 hover:text-red-300" />
               </Button>
             </div>
           </div>
         ))}
+        <p className="text-xs text-right text-muted-foreground">
+          Drag rows to reorder
+        </p>
         <button
           type="button"
           className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
@@ -70,12 +201,16 @@ export default function AdminBioSectionPanel({
           <Plus className="h-4 w-4" />
           <span>Add new detail in {title.replace(" Information", "")}</span>
         </button>
+        
       </CardContent>
       <BioUploadModal
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
         title={`Add ${title.replace(" Information", "")} detail`}
         description="Add or update biography text details."
+        onConfirm={handleCreate}
+        isSubmitting={isSubmitting}
+        errorMessage={errorMessage}
       />
     </Card>
   )

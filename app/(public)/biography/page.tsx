@@ -1,39 +1,13 @@
 import BioSection from "@/components/BioSection"
+import { supabaseServer } from "@/lib/server"
 
-const soloShows = [
-  {
-    year: "2024",
-    description:
-      "Tidal Notations apple browser hello bye, Glasshouse, Brooklyn, NY",
-  },
-  {
-    year: "2022",
-    description: "Holding Patterns, Drift Gallery, Los Angeles, CA",
-  },
-  {
-    year: "2020",
-    description: "Quiet Mechanics, Field Projects, New York, NY",
-  },
-  {
-    year: "2020",
-    description: "Quiet Mechanics, Field Projects, New York, NY",
-  },
-]
-
-const selectedGroupShows = [
-  {
-    year: "2025",
-    description: "Surface/Depth, Assembly Room, New York, NY",
-  },
-  {
-    year: "2024",
-    description: "Signals, ICA Boston (project room), Boston, MA",
-  },
-  {
-    year: "2023",
-    description: "Resonances, KUNSTRAUM, Brooklyn, NY",
-  },
-]
+const formatBioItems = (
+  rows: { title: string; location: string; year: number }[]
+) =>
+  rows.map((row) => ({
+    year: String(row.year),
+    description: `${row.title}, ${row.location}`,
+  }))
 
 const education = [
   {
@@ -50,7 +24,24 @@ const education = [
   },
 ]
 
-export default function Bio() {
+export default async function Bio() {
+  const supabase = await supabaseServer()
+  const [{ data: soloRows }, { data: groupRows }] = await Promise.all([
+    supabase
+      .from("bio_solo_shows")
+      .select("title, location, year")
+      .order("sort_order", { ascending: true })
+      .order("year", { ascending: false }),
+    supabase
+      .from("bio_group_shows")
+      .select("title, location, year")
+      .order("sort_order", { ascending: true })
+      .order("year", { ascending: false }),
+  ])
+
+  const soloShows = formatBioItems(soloRows ?? [])
+  const selectedGroupShows = formatBioItems(groupRows ?? [])
+
   return (
     <div className="space-y-10 font-light pt-6 md:pt-30">
       <BioSection title="solo shows" items={soloShows} />
