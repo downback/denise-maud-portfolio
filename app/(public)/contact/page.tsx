@@ -1,6 +1,6 @@
 export default function Contact() {
   return (
-    <div className="space-y-10 font-light">
+    <div className="space-y-10 font-light pt-6 md:pt-30">
       <section className="flex flex-col gap-4 md:flex-row">
         <h2 className="w-full text-sm md:w-xs md:text-base">email</h2>
         <p className="text-base">

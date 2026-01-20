@@ -52,7 +52,7 @@ const education = [
 
 export default function Bio() {
   return (
-    <div className="space-y-10 font-light">
+    <div className="space-y-10 font-light pt-6 md:pt-30">
       <BioSection title="solo shows" items={soloShows} />
       <BioSection title="selected group shows" items={selectedGroupShows} />
       <BioSection title="education" items={education} />

@@ -140,11 +140,14 @@ export async function POST(request: Request) {
     }
 
     const updatedAt = new Date().toISOString()
+    const animationEnabled =
+      formData.get("animationEnabled")?.toString() !== "false"
     const { data: updatedContent, error: siteContentUpdateError } = await supabase
       .from("site_content")
       .update({
         hero_asset_id: assetRow.id,
         updated_by: user.id,
+        hero_animation_enabled: animationEnabled,
         updated_at: updatedAt,
       })
       .eq("singleton_id", true)
@@ -194,6 +197,7 @@ export async function POST(request: Request) {
         hero_asset_id: assetRow.id,
         works_pdf_asset_id: worksAsset.id,
         updated_by: user.id,
+        hero_animation_enabled: animationEnabled,
         updated_at: updatedAt,
       })
 

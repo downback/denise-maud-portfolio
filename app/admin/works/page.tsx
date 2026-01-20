@@ -29,6 +29,16 @@ export default async function AdminWorks() {
         .maybeSingle()
 
       lastUpdatedLabel = formatUpdatedAt(asset?.created_at)
+    } else {
+      const { data: fallbackAsset } = await supabase
+        .from("assets")
+        .select("created_at")
+        .eq("asset_kind", "works_pdf")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      lastUpdatedLabel = formatUpdatedAt(fallbackAsset?.created_at)
     }
   } catch (error) {
     console.error("Failed to load works PDF metadata", { error })

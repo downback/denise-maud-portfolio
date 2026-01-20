@@ -8,16 +8,21 @@ import HeroUploadModal from "@/components/admin/HeroUploadModal"
 
 type AdminMainImagePreviewPanelProps = {
   heroImageUrl?: string | null
+  heroAnimationEnabled?: boolean | null
 }
 
 export default function AdminMainImagePreviewPanel({
   heroImageUrl,
+  heroAnimationEnabled,
 }: AdminMainImagePreviewPanelProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [currentImageUrl, setCurrentImageUrl] = useState(heroImageUrl ?? "")
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [isAnimationEnabled, setIsAnimationEnabled] = useState(
+    heroAnimationEnabled ?? true
+  )
 
   const handleConfirm = async () => {
     if (!selectedImageFile) {
@@ -31,6 +36,7 @@ export default function AdminMainImagePreviewPanel({
     try {
       const formData = new FormData()
       formData.append("file", selectedImageFile)
+      formData.append("animationEnabled", String(isAnimationEnabled))
 
       const response = await fetch("/api/admin/hero-image", {
         method: "POST",
@@ -127,6 +133,8 @@ export default function AdminMainImagePreviewPanel({
         title="Update hero image"
         description="Upload a new hero image or update the supporting text."
         onImageSelect={setSelectedImageFile}
+        animationEnabled={isAnimationEnabled}
+        onAnimationToggle={setIsAnimationEnabled}
         onConfirm={handleConfirm}
         confirmLabel="Save image"
         isConfirmDisabled={!selectedImageFile || isUploading}

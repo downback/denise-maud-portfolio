@@ -4,17 +4,22 @@ import { supabaseServer } from "@/lib/server"
 
 const bucketName = "site-assets"
 
-const fetchHeroImageUrl = async () => {
+type HeroMediaSettings = {
+  url: string | null
+  animationEnabled: boolean | null
+}
+
+const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
   try {
     const supabase = await supabaseServer()
     const { data: siteContent, error: siteContentError } = await supabase
       .from("site_content")
-      .select("hero_asset_id, updated_at")
+      .select("hero_asset_id, updated_at, hero_animation_enabled")
       .eq("singleton_id", true)
       .maybeSingle()
 
     if (siteContentError) {
-      return null
+      return { url: null, animationEnabled: null }
     }
 
     if (siteContent?.hero_asset_id) {
@@ -25,7 +30,10 @@ const fetchHeroImageUrl = async () => {
         .maybeSingle()
 
       if (assetError || !asset?.path) {
-        return null
+        return {
+          url: null,
+          animationEnabled: siteContent.hero_animation_enabled ?? null,
+        }
       }
 
       const { data } = supabase.storage
@@ -36,7 +44,10 @@ const fetchHeroImageUrl = async () => {
         ? `?v=${encodeURIComponent(siteContent.updated_at)}`
         : ""
 
-      return data.publicUrl ? `${data.publicUrl}${versionTag}` : null
+      return {
+        url: data.publicUrl ? `${data.publicUrl}${versionTag}` : null,
+        animationEnabled: siteContent.hero_animation_enabled ?? null,
+      }
     }
 
     const { data: fallbackAsset, error: fallbackError } = await supabase
@@ -48,7 +59,7 @@ const fetchHeroImageUrl = async () => {
       .maybeSingle()
 
     if (fallbackError || !fallbackAsset?.path) {
-      return null
+      return { url: null, animationEnabled: null }
     }
 
     const { data } = supabase.storage
@@ -59,19 +70,26 @@ const fetchHeroImageUrl = async () => {
       ? `?v=${encodeURIComponent(fallbackAsset.created_at)}`
       : ""
 
-    return data.publicUrl ? `${data.publicUrl}${versionTag}` : null
+    return {
+      url: data.publicUrl ? `${data.publicUrl}${versionTag}` : null,
+      animationEnabled: null,
+    }
   } catch (error) {
     console.error("Failed to load hero image", { error })
-    return null
+    return { url: null, animationEnabled: null }
   }
 }
 
 export default async function AdminMainPage() {
-  const heroImageUrl = await fetchHeroImageUrl()
+  const { url: heroImageUrl, animationEnabled: heroAnimationEnabled } =
+    await fetchHeroSettings()
 
   return (
     <div className="space-y-6">
-      <AdminMainImagePreviewPanel heroImageUrl={heroImageUrl} />
+      <AdminMainImagePreviewPanel
+        heroImageUrl={heroImageUrl}
+        heroAnimationEnabled={heroAnimationEnabled}
+      />
 
       <Card className="border-0 bg-muted shadow-none">
         <CardHeader className="pb-3">

@@ -10,7 +10,7 @@ type BioSectionProps = {
 
 export default function BioSection({ title, items }: BioSectionProps) {
   return (
-    <section className="flex flex-col gap-4 md:flex-row">
+    <section className="flex flex-col gap-4 lg:flex-row">
       <h2 className="w-full text-sm md:w-xs md:text-base">{title}</h2>
       <ul className="space-y-2 md:space-y-3">
         {items.map((item, index) => (

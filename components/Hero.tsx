@@ -18,12 +18,12 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
   const fetcher = async () => {
     const { data: siteContent, error: siteContentError } = await supabase
       .from("site_content")
-      .select("hero_asset_id, updated_at")
+      .select("hero_asset_id, updated_at, hero_animation_enabled")
       .eq("singleton_id", true)
       .maybeSingle()
 
     if (siteContentError) {
-      return null
+      return { url: null, animationEnabled: true }
     }
 
     if (siteContent?.hero_asset_id) {
@@ -34,7 +34,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
         .maybeSingle()
 
       if (assetError || !asset?.path) {
-        return null
+        return { url: null, animationEnabled: true }
       }
 
       const { data } = supabase.storage
@@ -45,7 +45,10 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
         ? `?v=${encodeURIComponent(siteContent.updated_at)}`
         : ""
 
-      return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
+      return {
+        url: data?.publicUrl ? `${data.publicUrl}${versionTag}` : null,
+        animationEnabled: siteContent.hero_animation_enabled ?? true,
+      }
     }
 
     const { data: fallbackAsset, error: fallbackError } = await supabase
@@ -57,7 +60,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
       .maybeSingle()
 
     if (fallbackError || !fallbackAsset?.path) {
-      return null
+      return { url: null, animationEnabled: true }
     }
 
     const { data } = supabase.storage
@@ -68,20 +71,22 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
       ? `?v=${encodeURIComponent(fallbackAsset.created_at)}`
       : ""
 
-    return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
+    return {
+      url: data?.publicUrl ? `${data.publicUrl}${versionTag}` : null,
+      animationEnabled: true,
+    }
   }
 
   // Use SWR with aggressive caching
-  const { data: imageUrl, isLoading } = useSWR<string | null>(
-    "hero-image",
-    fetcher,
-    {
+  const { data: heroData, isLoading } = useSWR<{
+    url: string | null
+    animationEnabled: boolean
+  }>("hero-image", fetcher, {
     revalidateOnFocus: false, // Don't refetch on window focus
     revalidateOnReconnect: false, // Don't refetch on reconnect
     dedupingInterval: 3600000, // Dedupe requests within 1 hour
-      fallbackData: null,
-    }
-  )
+      fallbackData: { url: null, animationEnabled: true },
+    })
 
   if (isLoading) {
     return (
@@ -91,13 +96,19 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     )
   }
 
+  const isAnimationEnabled = heroData?.animationEnabled ?? true
+
   return (
     <div className="fixed inset-0 md:relative -z-10">
-      <div className="flex items-center justify-center w-full min-h-screen md:min-h-auto">
-        <div className="hero-float w-[80vw] h-auto md:w-auto md:h-[70vh]">
-          {imageUrl ? (
+      <div className="flex items-center justify-center w-full min-h-screen md:min-h-screen">
+        <div
+          className={`w-[80vw] h-auto md:w-auto md:h-[70vh] ${
+            isAnimationEnabled ? "hero-float" : ""
+          }`}
+        >
+          {heroData?.url ? (
             <Image
-              src={imageUrl}
+              src={heroData.url}
               alt={alt}
               width={1920}
               height={1080}

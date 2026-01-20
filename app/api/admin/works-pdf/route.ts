@@ -109,12 +109,48 @@ export async function POST(request: Request) {
     }
 
     if (!updatedContent) {
-      await supabase.storage.from(bucketName).remove([storagePath])
-      await supabase.from("assets").delete().eq("id", assetRow.id)
-      return NextResponse.json(
-        { error: "Site content singleton is missing. Insert it first." },
-        { status: 500 }
-      )
+      const { data: heroAsset } = await supabase
+        .from("assets")
+        .select("id")
+        .eq("asset_kind", "hero_media")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (!heroAsset?.id) {
+        const { data } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(storagePath)
+        const versionedUrl = data.publicUrl
+          ? `${data.publicUrl}?v=${encodeURIComponent(updatedAt)}`
+          : undefined
+
+        return NextResponse.json({
+          publicUrl: versionedUrl,
+          updatedAt,
+          warning:
+            "Site content singleton is missing. Works PDF uploaded, but metadata was not updated yet.",
+        })
+      }
+
+      const { error: insertError } = await supabase.from("site_content").insert({
+        singleton_id: true,
+        intro_text: "",
+        statement_text: "",
+        hero_asset_id: heroAsset.id,
+        works_pdf_asset_id: assetRow.id,
+        updated_by: user.id,
+        updated_at: updatedAt,
+      })
+
+      if (insertError) {
+        await supabase.storage.from(bucketName).remove([storagePath])
+        await supabase.from("assets").delete().eq("id", assetRow.id)
+        return NextResponse.json(
+          { error: "Unable to create site content." },
+          { status: 500 }
+        )
+      }
     }
 
     const previousPath = previousAsset?.path
