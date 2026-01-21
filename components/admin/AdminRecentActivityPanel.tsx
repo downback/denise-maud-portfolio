@@ -54,7 +54,6 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
       siteContentResult,
       soloShowsResult,
       groupShowsResult,
-      educationResult,
       assetsResult,
     ] = await Promise.all([
       supabase.from("site_content").select("updated_at").limit(1),
@@ -69,11 +68,6 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
         .order("updated_at", { ascending: false })
         .limit(2),
       supabase
-        .from("bio_education")
-        .select("updated_at")
-        .order("updated_at", { ascending: false })
-        .limit(2),
-      supabase
         .from("assets")
         .select("created_at, asset_kind")
         .order("created_at", { ascending: false })
@@ -84,14 +78,12 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
       siteContentResult.error ||
       soloShowsResult.error ||
       groupShowsResult.error ||
-      educationResult.error ||
       assetsResult.error
     ) {
       throw (
         siteContentResult.error ||
         soloShowsResult.error ||
         groupShowsResult.error ||
-        educationResult.error ||
         assetsResult.error
       )
     }
@@ -117,14 +109,6 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
     })
 
     groupShowsResult.data?.forEach((item) => {
-      if (item.updated_at) {
-        activities.push(
-          buildActivityItem("update", "Biography", item.updated_at)
-        )
-      }
-    })
-
-    educationResult.data?.forEach((item) => {
       if (item.updated_at) {
         activities.push(
           buildActivityItem("update", "Biography", item.updated_at)
