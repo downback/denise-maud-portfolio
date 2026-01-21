@@ -7,6 +7,22 @@ type BioPayload = {
   year?: number
 }
 
+const logActivity = async (supabase: Awaited<ReturnType<typeof supabaseServer>>, userId: string, action: "add" | "update" | "delete") => {
+  const { error } = await supabase.from("activity_log").insert({
+    area: "Biography",
+    action,
+    created_by: userId,
+  })
+
+  if (error) {
+    console.warn("Activity log insert failed", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = await supabaseServer()
@@ -49,6 +65,7 @@ export async function POST(request: Request) {
       )
     }
 
+    await logActivity(supabase, user.id, "add")
     return NextResponse.json(data)
   } catch (error) {
     console.error("Solo show create failed", { error })

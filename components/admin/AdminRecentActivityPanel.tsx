@@ -15,7 +15,7 @@ type RecentActivityResult = {
 }
 
 const actionLabels: Record<ActivityItem["action"], string> = {
-  add: "add new",
+  add: "add",
   update: "update",
   delete: "delete",
 }
@@ -46,9 +46,18 @@ const buildActivityItem = (
   sortTime: new Date(timestamp).getTime(),
 })
 
+const isMissingTableError = (error: { code?: string } | null) =>
+  error?.code === "PGRST205"
+
 const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
   try {
     const supabase = await supabaseServer()
+
+    const { data: activityLog, error: activityLogError } = await supabase
+      .from("activity_log")
+      .select("action, area, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10)
 
     const [
       siteContentResult,
@@ -57,16 +66,20 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
       assetsResult,
     ] = await Promise.all([
       supabase.from("site_content").select("updated_at").limit(1),
-      supabase
-        .from("bio_solo_shows")
-        .select("updated_at")
-        .order("updated_at", { ascending: false })
-        .limit(2),
-      supabase
-        .from("bio_group_shows")
-        .select("updated_at")
-        .order("updated_at", { ascending: false })
-        .limit(2),
+      isMissingTableError(activityLogError)
+        ? supabase
+            .from("bio_solo_shows")
+            .select("updated_at")
+            .order("updated_at", { ascending: false })
+            .limit(2)
+        : Promise.resolve({ data: null, error: null }),
+      isMissingTableError(activityLogError)
+        ? supabase
+            .from("bio_group_shows")
+            .select("updated_at")
+            .order("updated_at", { ascending: false })
+            .limit(2)
+        : Promise.resolve({ data: null, error: null }),
       supabase
         .from("assets")
         .select("created_at, asset_kind")
@@ -75,12 +88,14 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
     ])
 
     if (
+      (activityLogError && !isMissingTableError(activityLogError)) ||
       siteContentResult.error ||
       soloShowsResult.error ||
       groupShowsResult.error ||
       assetsResult.error
     ) {
       throw (
+        activityLogError ||
         siteContentResult.error ||
         soloShowsResult.error ||
         groupShowsResult.error ||
@@ -100,21 +115,31 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
       )
     }
 
-    soloShowsResult.data?.forEach((item) => {
-      if (item.updated_at) {
-        activities.push(
-          buildActivityItem("update", "Biography", item.updated_at)
-        )
-      }
+    activityLog?.forEach((item) => {
+      if (!item.created_at) return
+      if (item.area !== "Biography") return
+      activities.push(
+        buildActivityItem(item.action, item.area, item.created_at)
+      )
     })
 
-    groupShowsResult.data?.forEach((item) => {
-      if (item.updated_at) {
-        activities.push(
-          buildActivityItem("update", "Biography", item.updated_at)
-        )
-      }
-    })
+    if (isMissingTableError(activityLogError)) {
+      soloShowsResult.data?.forEach((item) => {
+        if (item.updated_at) {
+          activities.push(
+            buildActivityItem("update", "Biography", item.updated_at)
+          )
+        }
+      })
+
+      groupShowsResult.data?.forEach((item) => {
+        if (item.updated_at) {
+          activities.push(
+            buildActivityItem("update", "Biography", item.updated_at)
+          )
+        }
+      })
+    }
 
     assetsResult.data?.forEach((item) => {
       if (!item.created_at) return
@@ -124,7 +149,7 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
 
     const sortedActivities = activities
       .sort((a, b) => b.sortTime - a.sortTime)
-      .slice(0, 6)
+      .slice(0, 7)
 
     return { activities: sortedActivities, hasError: false }
   } catch (error) {

@@ -46,7 +46,7 @@ export default function AdminQuickPreviewPanel() {
       <CardHeader>
         <CardTitle>Preview & Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <CardContent className="grid gap-4 xl:grid-cols-3">
         {previewCards.map((card) => (
           <Card key={card.title} className="h-full">
             <CardHeader className="pb-3">
