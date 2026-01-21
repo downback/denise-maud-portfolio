@@ -8,7 +8,8 @@ const formatBioItems = (
   rows.map((row) => ({
     id: row.id,
     year: String(row.year),
-    description: `${row.title}, ${row.location}`,
+    title: row.title,
+    location: row.location,
   }))
 
 export default async function AdminBiography() {

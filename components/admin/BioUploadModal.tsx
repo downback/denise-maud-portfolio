@@ -1,6 +1,4 @@
 "use client"
-
-import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -24,7 +22,9 @@ type BioUploadModalProps = {
   onOpenChange: (open: boolean) => void
   title?: string
   description?: string
-  onConfirm?: (values: BioFormValues) => void
+  values: BioFormValues
+  onValuesChange: (values: BioFormValues) => void
+  onConfirm?: () => void
   confirmLabel?: string
   isConfirmDisabled?: boolean
   isSubmitting?: boolean
@@ -36,41 +36,21 @@ export default function BioUploadModal({
   onOpenChange,
   title = "Update Content",
   description = "Update text content.",
+  values,
+  onValuesChange,
   onConfirm,
   confirmLabel = "Confirm change",
   isConfirmDisabled = false,
   isSubmitting = false,
   errorMessage,
 }: BioUploadModalProps) {
-  const [year, setYear] = useState("")
-  const [titleValue, setTitleValue] = useState("")
-  const [locationValue, setLocationValue] = useState("")
-
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) {
-      setYear("")
-      setTitleValue("")
-      setLocationValue("")
-    }
-
-    onOpenChange(nextOpen)
-  }
-
-  const handleConfirm = () => {
-    onConfirm?.({
-      year: year.trim(),
-      title: titleValue.trim(),
-      location: locationValue.trim(),
-    })
-  }
-
   const hasRequiredValues =
-    year.trim().length > 0 &&
-    titleValue.trim().length > 0 &&
-    locationValue.trim().length > 0
+    values.year.trim().length > 0 &&
+    values.title.trim().length > 0 &&
+    values.location.trim().length > 0
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md md:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -84,24 +64,39 @@ export default function BioUploadModal({
               id="upload-year"
               type="text"
               placeholder="Year (e.g., 2024)"
-              value={year}
-              onChange={(event) => setYear(event.target.value)}
+              value={values.year}
+              onChange={(event) =>
+                onValuesChange({
+                  ...values,
+                  year: event.target.value,
+                })
+              }
             />
             <Label htmlFor="upload-title">Title</Label>
             <Input
               id="upload-title"
               type="text"
               placeholder="Show title"
-              value={titleValue}
-              onChange={(event) => setTitleValue(event.target.value)}
+              value={values.title}
+              onChange={(event) =>
+                onValuesChange({
+                  ...values,
+                  title: event.target.value,
+                })
+              }
             />
             <Label htmlFor="upload-location">Location</Label>
             <Input
               id="upload-location"
               type="text"
               placeholder="Location"
-              value={locationValue}
-              onChange={(event) => setLocationValue(event.target.value)}
+              value={values.location}
+              onChange={(event) =>
+                onValuesChange({
+                  ...values,
+                  location: event.target.value,
+                })
+              }
             />
           </div>
         </div>
@@ -113,14 +108,14 @@ export default function BioUploadModal({
           <Button
             type="button"
             variant="secondary"
-            onClick={() => handleOpenChange(false)}
+            onClick={() => onOpenChange(false)}
           >
             Dismiss
           </Button>
           <Button
             type="button"
             variant="highlight"
-            onClick={handleConfirm}
+            onClick={onConfirm}
             disabled={!hasRequiredValues || isConfirmDisabled || isSubmitting}
           >
             {isSubmitting ? "Saving..." : confirmLabel}
