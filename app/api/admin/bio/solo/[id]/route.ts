@@ -26,6 +26,7 @@ const logActivity = async (
   const { error } = await supabase.from("activity_log").insert({
     area: "Biography",
     action,
+    context: "solo",
     created_by: userId,
   })
 

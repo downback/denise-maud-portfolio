@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 type ActivityItem = {
   action: "add" | "update" | "delete"
   area: "Main Page" | "Works" | "Biography"
+  context?: "solo" | "group"
   date: string
   sortTime: number
 }
@@ -38,10 +39,12 @@ const formatActivityDate = (timestamp: string) =>
 const buildActivityItem = (
   action: ActivityItem["action"],
   area: ActivityItem["area"],
-  timestamp: string
+  timestamp: string,
+  context?: ActivityItem["context"]
 ): ActivityItem => ({
   action,
   area,
+  context,
   date: formatActivityDate(timestamp),
   sortTime: new Date(timestamp).getTime(),
 })
@@ -55,7 +58,7 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
 
     const { data: activityLog, error: activityLogError } = await supabase
       .from("activity_log")
-      .select("action, area, created_at")
+      .select("action, area, context, created_at")
       .order("created_at", { ascending: false })
       .limit(10)
 
@@ -119,7 +122,7 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
       if (!item.created_at) return
       if (item.area !== "Biography") return
       activities.push(
-        buildActivityItem(item.action, item.area, item.created_at)
+        buildActivityItem(item.action, item.area, item.created_at, item.context)
       )
     })
 
@@ -160,6 +163,12 @@ const fetchRecentActivities = async (): Promise<RecentActivityResult> => {
 
 export default async function AdminRecentActivityPanel() {
   const { activities, hasError } = await fetchRecentActivities()
+  const formatAreaLabel = (activity: ActivityItem) => {
+    if (activity.area === "Biography" && activity.context) {
+      return `${activity.context} show info`
+    }
+    return activity.area
+  }
 
   return (
     <Card>
@@ -189,7 +198,9 @@ export default async function AdminRecentActivityPanel() {
                   >
                     {actionLabels[activity.action]}
                   </span>
-                  <span className="font-medium">{activity.area}</span>
+                  <span className="font-medium">
+                    {formatAreaLabel(activity)}
+                  </span>
                 </div>
                 <span className="text-xs text-muted-foreground">
                   {activity.date}

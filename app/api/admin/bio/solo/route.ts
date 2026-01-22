@@ -7,10 +7,15 @@ type BioPayload = {
   year?: number
 }
 
-const logActivity = async (supabase: Awaited<ReturnType<typeof supabaseServer>>, userId: string, action: "add" | "update" | "delete") => {
+const logActivity = async (
+  supabase: Awaited<ReturnType<typeof supabaseServer>>,
+  userId: string,
+  action: "add" | "update" | "delete"
+) => {
   const { error } = await supabase.from("activity_log").insert({
     area: "Biography",
     action,
+    context: "solo",
     created_by: userId,
   })
 
