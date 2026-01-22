@@ -14,13 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { supabaseBrowser } from "@/lib/client"
-import { z } from "zod"
-
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  // Keeping password free of format rules per requirements.
-  password: z.string(),
-})
 
 export default function AdminLoginModal() {
   const supabase = useMemo(() => supabaseBrowser(), [])
@@ -29,53 +22,28 @@ export default function AdminLoginModal() {
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [authError, setAuthError] = useState("")
-  const [emailError, setEmailError] = useState("")
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (isSubmitting) return
     setIsSubmitting(true)
     setAuthError("")
-    setEmailError("")
     try {
-      const parsed = loginSchema.safeParse({ email, password })
-      if (!parsed.success) {
-        const firstIssue = parsed.error.issues[0]
-        const message = firstIssue?.message ?? "Invalid input."
-        setEmailError(message)
+      if (!email || !password) {
+        const message = "Email and password are required."
+        setAuthError(message)
         toast({ title: "Login failed", description: message })
         setIsSubmitting(false)
         return
       }
 
-      const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
       if (signInError) {
-        throw new Error("Invalid admin email")
-      }
-
-      const userId = signInData.user?.id
-      if (!userId) {
-        throw new Error("No user session returned from Supabase.")
-      }
-
-      const { data: adminRow, error: adminQueryError } = await supabase
-        .from("app_admin")
-        .select("admin_user_id")
-        .eq("singleton_id", true)
-        .maybeSingle()
-
-      if (adminQueryError) {
-        throw adminQueryError
-      }
-
-      if (!adminRow || adminRow.admin_user_id !== userId) {
-        await supabase.auth.signOut()
-        throw new Error("You are not authorized as admin.")
+        throw new Error("Login failed. Please check your credentials.")
       }
 
       toast({ title: "Signed in", description: "Admin access granted." })
@@ -86,15 +54,6 @@ export default function AdminLoginModal() {
         error instanceof Error && error.message
           ? error.message
           : fallbackMessage
-
-      const isExpectedAuthError =
-        message === "Invalid admin email" ||
-        message === "You are not authorized as admin."
-
-      if (!isExpectedAuthError) {
-        console.error("Admin login failed", error)
-      }
-
       setAuthError(message)
       toast({ title: "Login failed", description: message })
     } finally {
@@ -125,28 +84,12 @@ export default function AdminLoginModal() {
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value)
-                if (emailError) setEmailError("")
+                if (authError) setAuthError("")
               }}
               placeholder="admin@example.com"
-              aria-invalid={emailError || authError ? "true" : "false"}
-              aria-describedby={
-                [
-                  emailError ? "admin-email-error" : null,
-                  authError ? "admin-auth-error" : null,
-                ]
-                  .filter(Boolean)
-                  .join(" ") || undefined
-              }
+              aria-invalid={authError ? "true" : "false"}
+              aria-describedby={authError ? "admin-auth-error" : undefined}
             />
-            {emailError ? (
-              <p
-                id="admin-email-error"
-                className="text-sm text-destructive"
-                role="alert"
-              >
-                {emailError}
-              </p>
-            ) : null}
             {authError ? (
               <p
                 id="admin-auth-error"
