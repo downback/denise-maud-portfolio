@@ -2,8 +2,10 @@ import AdminBioSectionPanel from "@/components/admin/AdminBioSectionPanel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { supabaseServer } from "@/lib/server"
 
+export const dynamic = "force-dynamic"
+
 const formatBioItems = (
-  rows: { id: string; title: string; location: string; year: number }[]
+  rows: { id: string; title: string; location: string; year: number }[],
 ) =>
   rows.map((row) => ({
     id: row.id,

@@ -4,6 +4,8 @@ import { supabaseServer } from "@/lib/server"
 
 const bucketName = "site-assets"
 
+export const dynamic = "force-dynamic"
+
 type HeroMediaSettings = {
   url: string | null
   animationEnabled: boolean | null

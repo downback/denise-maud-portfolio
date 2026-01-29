@@ -2,6 +2,8 @@ import AdminWorksPdfPanel from "@/components/admin/AdminWorksPdfPanel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { supabaseServer } from "@/lib/server"
 
+export const dynamic = "force-dynamic"
+
 const formatUpdatedAt = (value?: string | null) => {
   if (!value) return null
   return new Intl.DateTimeFormat("en-US", {
