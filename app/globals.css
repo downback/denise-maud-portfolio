@@ -159,3 +159,11 @@
 .link-underline-active::after {
   transform: translateY(-50%) scaleX(1);
 }
+
+body {
+  min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
+}
