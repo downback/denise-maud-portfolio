@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
@@ -16,8 +16,44 @@ const navLinks = [
 export default function SidebarNav() {
   const pathname = usePathname()
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const scrollPositionRef = useRef(0)
 
   const closeMobileNav = () => setIsMobileNavOpen(false)
+
+  useEffect(() => {
+    if (!isMobileNavOpen) {
+      return
+    }
+
+    const isIos =
+      typeof navigator !== "undefined" &&
+      /iP(hone|ad|od)/.test(navigator.userAgent)
+    const body = document.body
+
+    if (isIos) {
+      scrollPositionRef.current = window.scrollY
+      body.style.position = "fixed"
+      body.style.top = `-${scrollPositionRef.current}px`
+      body.style.left = "0"
+      body.style.right = "0"
+      body.style.width = "100%"
+    } else {
+      body.style.overflow = "hidden"
+    }
+
+    return () => {
+      if (isIos) {
+        body.style.position = ""
+        body.style.top = ""
+        body.style.left = ""
+        body.style.right = ""
+        body.style.width = ""
+        window.scrollTo(0, scrollPositionRef.current)
+      } else {
+        body.style.overflow = ""
+      }
+    }
+  }, [isMobileNavOpen])
 
   return (
     <>
