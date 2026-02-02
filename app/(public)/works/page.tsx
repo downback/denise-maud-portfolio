@@ -74,7 +74,7 @@ export default function Works() {
       revalidateOnReconnect: false, // Don't refetch on reconnect
       dedupingInterval: 3600000, // Dedupe requests within 1 hour
       fallbackData: null,
-    }
+    },
   )
 
   return (
@@ -82,23 +82,32 @@ export default function Works() {
       <div className="space-y-2">
         <div className="flex flex-row justify-center md:justify-end">
           {pdfUrl ? (
-            <a
-              className="text-sm font-normal text-primary underline underline-offset-4"
-              href={pdfUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open portfolio PDF in new tab
-            </a>
+            <>
+              <a
+                className="hidden sm:block text-sm font-normal text-primary underline underline-offset-4"
+                href={pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open portfolio PDF in new tab
+              </a>
+              <a
+                className="block sm:hidden text-sm font-normal text-primary underline underline-offset-4"
+                href={pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open portfolio in new tab
+              </a>
+            </>
           ) : (
             <span className="text-sm font-normal text-muted-foreground">
               Portfolio PDF not available yet
             </span>
           )}
         </div>
-        <p className="text-sm leading-none text-center text-muted-foreground block md:hidden">
-          The portfolio is displayed in a PDF viewer, <br /> which can be opened
-          in a new tab.
+        <p className="text-xs leading-none text-center text-muted-foreground block md:hidden">
+          You can view or download the full portfolio PDF
         </p>
       </div>
 

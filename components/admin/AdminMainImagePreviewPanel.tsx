@@ -23,7 +23,7 @@ export default function AdminMainImagePreviewPanel({
   const [isUploading, setIsUploading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [isAnimationEnabled, setIsAnimationEnabled] = useState(
-    heroAnimationEnabled ?? true
+    heroAnimationEnabled ?? true,
   )
   const [imageCaption, setImageCaption] = useState(heroCaption ?? "")
 
@@ -99,7 +99,7 @@ export default function AdminMainImagePreviewPanel({
                 alt="Hero image preview for desktop"
                 fill
                 sizes="(min-width: 768px) 66vw, 100vw"
-                className="object-cover"
+                className="object-scale-down"
                 unoptimized
               />
             ) : (
@@ -113,14 +113,14 @@ export default function AdminMainImagePreviewPanel({
           <p className="text-sm font-medium text-muted-foreground">
             Mobile (9:16)
           </p>
-          <div className="relative aspect-9/16 w-full overflow-hidden rounded-md border border-dashed border-border bg-muted/30 md:h-fit">
+          <div className="relative aspect-9/16 w-full rounded-md border border-dashed border-border bg-muted/30">
             {currentImageUrl ? (
               <Image
                 src={currentImageUrl}
                 alt="Hero image preview for mobile"
                 fill
                 sizes="(min-width: 768px) 33vw, 100vw"
-                className="object-cover"
+                className="object-scale-down"
                 unoptimized
               />
             ) : (

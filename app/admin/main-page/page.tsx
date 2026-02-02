@@ -109,14 +109,9 @@ export default async function AdminMainPage() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           <ul className="list-disc space-y-2 pl-5">
-            <li>
-              Use high-resolution images for best quality (minimum 1920px wide).
-            </li>
-            <li>
-              The image will be displayed in a 21:9 aspect ratio on desktop.
-            </li>
-            <li>On mobile, the image will be cropped to fit a 16:9 ratio.</li>
-            <li>Avoid placing important elements at the edges.</li>
+            <li>Image files must be under 1 MB (maximum 1.5 MB)</li>
+            <li>the longest side must not exceed 3000 px.</li>
+            <li>DPI does not affect web output quality.</li>
           </ul>
         </CardContent>
       </Card>

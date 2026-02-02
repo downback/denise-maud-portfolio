@@ -5,7 +5,7 @@ import { supabaseServer } from "@/lib/server"
 export default async function Admin() {
   let connectionStatus = {
     status: "connected",
-    message: "Connected to Supabase.",
+    message: "Connected to server successfully.",
   }
 
   try {
@@ -22,7 +22,7 @@ export default async function Admin() {
     console.error("Supabase connection test failed", { error })
     connectionStatus = {
       status: "error",
-      message: "Unable to connect to Supabase. Check server logs and env vars.",
+      message: "Unable to connect to server. Contact to administrator.",
     }
   }
 

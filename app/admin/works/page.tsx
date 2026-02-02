@@ -58,10 +58,11 @@ export default async function AdminWorks() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           <ul className="list-disc space-y-2 pl-5">
-            <li>Use a single PDF file named portfolio.pdf.</li>
+            <li>
+              Use a single PDF file and recommend name it
+              &quot;portfolio.pdf&ldquo;
+            </li>
             <li>Recommended size: under 15MB for fast loading.</li>
-            <li>Include a cover page and keep page order final.</li>
-            <li>Update the file whenever new work is added.</li>
           </ul>
         </CardContent>
       </Card>

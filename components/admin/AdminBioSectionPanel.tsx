@@ -45,7 +45,11 @@ export default function AdminBioSectionPanel({
 
   const hasValidId = (value?: string | null) => {
     const normalized = normalizeId(value)
-    return normalized.length > 0 && normalized !== "undefined" && /^[0-9a-fA-F-]{36}$/.test(normalized)
+    return (
+      normalized.length > 0 &&
+      normalized !== "undefined" &&
+      /^[0-9a-fA-F-]{36}$/.test(normalized)
+    )
   }
 
   const resetForm = () => {
@@ -196,8 +200,8 @@ export default function AdminBioSectionPanel({
                 title: payload.title ?? formValues.title,
                 location: payload.location ?? formValues.location,
               }
-            : item
-        )
+            : item,
+        ),
       )
       setIsUploadOpen(false)
       resetForm()
@@ -232,7 +236,7 @@ export default function AdminBioSectionPanel({
       }
 
       setCurrentItems((prevItems) =>
-        prevItems.filter((entry) => entry.id !== id)
+        prevItems.filter((entry) => entry.id !== id),
       )
     } catch (error) {
       console.error("Failed to delete bio entry", { error })
@@ -303,10 +307,11 @@ export default function AdminBioSectionPanel({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 md:space-y-4 ">
-        
         {currentItems.map((item, index) => (
           <div
-            key={item.id ?? `${item.year}-${item.title}-${item.location}-${index}`}
+            key={
+              item.id ?? `${item.year}-${item.title}-${item.location}-${index}`
+            }
             className={`flex flex-row gap-3 border-b border-border pb-3 md:pb-4 last:border-b-0 first:border-t first:border-border first:pt-3 md:first:pt-4 last:pb-0 md:items-center justify-between ${
               dragOverIndex === index ? "bg-muted/40" : ""
             }`}
@@ -326,15 +331,15 @@ export default function AdminBioSectionPanel({
             }}
           >
             <div className="flex flex-row gap-4 md:gap-6 items-center">
-            <div className="flex items-center text-muted-foreground">
-              <GripVertical className="h-4 w-4" />
-            </div>
-            <div className="space-x-2 md:space-x-3">
-              <span className="text-sm font-medium">{item.year}</span>
-              <span className="text-sm">
-                {item.title}, {item.location}
-              </span>
-            </div>
+              <div className="flex items-center text-muted-foreground">
+                <GripVertical className="h-4 w-4" />
+              </div>
+              <div className="space-x-2 md:space-x-3">
+                <span className="text-sm font-medium">{item.year}</span>
+                <span className="text-sm">
+                  {item.title}, {item.location}
+                </span>
+              </div>
             </div>
             <div className="flex gap-0 md:gap-2 items-center">
               {hasValidId(item.id) ? null : (
@@ -381,7 +386,7 @@ export default function AdminBioSectionPanel({
             </div>
           </div>
         ))}
-        <p className="text-xs text-right text-muted-foreground">
+        <p className="text-xs text-left text-muted-foreground">
           Drag rows to reorder
         </p>
         <button
@@ -393,7 +398,6 @@ export default function AdminBioSectionPanel({
           <Plus className="h-4 w-4" />
           <span>Add new detail in {title.replace(" Information", "")}</span>
         </button>
-        
       </CardContent>
       <BioUploadModal
         open={isUploadOpen}
