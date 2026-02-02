@@ -24,6 +24,7 @@ export default function RootLayout({
         className={`${inter.className} min-h-dvh bg-background text-foreground antialiased`}
       >
         {children}
+
         <Toaster />
       </body>
     </html>
