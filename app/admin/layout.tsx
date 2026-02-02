@@ -29,7 +29,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         .eq("singleton_id", true)
         .maybeSingle()
 
-      if (adminError || !adminRow || adminRow.admin_user_id !== session.user.id) {
+      if (
+        adminError ||
+        !adminRow ||
+        adminRow.admin_user_id !== session.user.id
+      ) {
         await supabase.auth.signOut()
         if (mounted) setAuthStatus("unauthorized")
         return
@@ -90,7 +94,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="flex min-h-dvh flex-col md:flex-row">
       <AdminSidebar />
       <main className="flex-1 p-6 pt-22 md:pt-6 md:pl-72">
         <AdminPageHeader />
