@@ -115,6 +115,12 @@ export async function POST(request: Request) {
       )
     }
 
+    const captionValue = formData.get("caption")
+    const caption =
+      typeof captionValue === "string" && captionValue.trim().length > 0
+        ? captionValue.trim()
+        : null
+
     const { data: assetRow, error: assetError } = await supabase
       .from("assets")
       .insert({
@@ -124,6 +130,7 @@ export async function POST(request: Request) {
         mime_type: file.type || "application/octet-stream",
         byte_size: file.size,
         created_by: user.id,
+        caption,
       })
       .select("id")
       .single()

@@ -20,6 +20,8 @@ type HeroUploadModalProps = {
   title?: string
   description?: string
   onImageSelect?: (file: File | null) => void
+  captionValue?: string
+  onCaptionChange?: (value: string) => void
   animationEnabled?: boolean
   onAnimationToggle?: (enabled: boolean) => void
   onConfirm?: () => void
@@ -35,6 +37,8 @@ export default function HeroUploadModal({
   title = "Update Content",
   description = "Upload an image or update text content.",
   onImageSelect,
+  captionValue = "",
+  onCaptionChange,
   animationEnabled = true,
   onAnimationToggle,
   onConfirm,
@@ -71,6 +75,7 @@ export default function HeroUploadModal({
       setImagePreviewUrl("")
       onImageSelect?.(null)
       setIsAnimationEnabled(animationEnabled)
+      onCaptionChange?.("")
     }
 
     onOpenChange(nextOpen)
@@ -150,6 +155,14 @@ export default function HeroUploadModal({
             </Button>
             <span className="text-xs text-muted-foreground">*there {isAnimationEnabled ? "will" : "won't"} be an animation on the hero image</span>
           </div>
+          <Label>Image caption</Label>
+          <Input
+            id="image-caption"
+            type="text"
+            placeholder="Enter image caption"
+            value={captionValue}
+            onChange={(event) => onCaptionChange?.(event.target.value)}
+          />
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">

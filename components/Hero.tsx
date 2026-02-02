@@ -29,7 +29,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     if (siteContent?.hero_asset_id) {
       const { data: asset, error: assetError } = await supabase
         .from("assets")
-        .select("path")
+        .select("path, caption")
         .eq("id", siteContent.hero_asset_id)
         .maybeSingle()
 
@@ -48,12 +48,13 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
       return {
         url: data?.publicUrl ? `${data.publicUrl}${versionTag}` : null,
         animationEnabled: siteContent.hero_animation_enabled ?? true,
+        caption: asset.caption ?? null,
       }
     }
 
     const { data: fallbackAsset, error: fallbackError } = await supabase
       .from("assets")
-      .select("path, created_at")
+      .select("path, created_at, caption")
       .eq("asset_kind", "hero_media")
       .order("created_at", { ascending: false })
       .limit(1)
@@ -74,6 +75,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     return {
       url: data?.publicUrl ? `${data.publicUrl}${versionTag}` : null,
       animationEnabled: true,
+      caption: fallbackAsset.caption ?? null,
     }
   }
 
@@ -81,12 +83,13 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
   const { data: heroData, isLoading } = useSWR<{
     url: string | null
     animationEnabled: boolean
+    caption?: string | null
   }>("hero-image", fetcher, {
     revalidateOnFocus: false, // Don't refetch on window focus
     revalidateOnReconnect: false, // Don't refetch on reconnect
     dedupingInterval: 3600000, // Dedupe requests within 1 hour
-      fallbackData: { url: null, animationEnabled: true },
-    })
+    fallbackData: { url: null, animationEnabled: true, caption: null },
+  })
 
   if (isLoading) {
     return (
@@ -102,7 +105,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     <div className="fixed inset-0 md:relative -z-10">
       <div className="flex items-center justify-center w-full min-h-screen md:min-h-screen">
         <div
-          className={`w-[80vw] h-auto md:w-auto md:h-[70vh] ${
+          className={`w-[80vw] h-auto md:w-auto md:h-[70vh]  ${
             isAnimationEnabled ? "hero-float" : ""
           }`}
         >
@@ -121,6 +124,11 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
               No hero image available
             </div>
           )}
+          {heroData?.caption ? (
+            <div className="text-center mt-4 text-xs sm:text-sm font-light">
+              {heroData.caption}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

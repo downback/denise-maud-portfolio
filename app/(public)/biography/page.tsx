@@ -2,7 +2,7 @@ import BioSection from "@/components/BioSection"
 import { supabaseServer } from "@/lib/server"
 
 const formatBioItems = (
-  rows: { title: string; location: string; year: number }[]
+  rows: { title: string; location: string; year: number }[],
 ) =>
   rows.map((row) => ({
     year: String(row.year),
@@ -11,16 +11,21 @@ const formatBioItems = (
 
 const education = [
   {
-    year: "2023",
-    description: "MFA, Sculpture, Yale School of Art",
+    year: "2020 - 2022",
+    description: "Master Fine Arts, Zurich University of the Arts, Switzerland",
   },
   {
-    year: "2020",
-    description: "BFA, Fine Arts, Rhode Island School of Design",
+    year: "2018 - 2020",
+    description: "Propädeutikum, Zurich University of the Arts, Switzerland",
   },
   {
-    year: "2018",
-    description: "Residency, Skowhegan School of Painting & Sculpture",
+    year: "2015 - 2019",
+    description: "Pädagogische Hochschule Zürich, Switzerland",
+  },
+  {
+    year: "2010 - 2013",
+    description:
+      "BA (Hons) Magazine Publishing, London College of Communication, University of the Arts, London, England",
   },
 ]
 

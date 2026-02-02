@@ -32,7 +32,7 @@ export default function SidebarNav() {
               <span
                 className={cn(
                   "link-underline",
-                  pathname === link.href && "link-underline-active"
+                  pathname === link.href && "link-underline-active",
                 )}
               >
                 {link.label}
@@ -43,9 +43,9 @@ export default function SidebarNav() {
       </aside>
 
       {/* Mobile Header */}
-      <header className="flex md:hidden items-center justify-between border-b border-border px-4 py-2 backdrop-blur-sm">
+      <header className="flex md:hidden items-center justify-between border-b border-border px-2 py-2 backdrop-blur-sm">
         <Link
-          className="text-base font-normal"
+          className="text-base font-normal pl-2"
           href="/"
           onClick={closeMobileNav}
         >
@@ -57,7 +57,7 @@ export default function SidebarNav() {
           aria-label="Open menu"
           onClick={() => setIsMobileNavOpen(true)}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 " strokeWidth={1.3} />
         </Button>
       </header>
 
@@ -70,14 +70,14 @@ export default function SidebarNav() {
             aria-hidden="true"
           />
           <aside className="fixed right-0 top-0 z-50 h-full w-1/2 bg-white border-l border-border text-right md:hidden">
-            <div className="flex justify-end px-4 py-2">
+            <div className="flex justify-end px-4 py-4">
               <Button
                 variant="default"
                 size="icon"
                 aria-label="Close menu"
                 onClick={closeMobileNav}
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" strokeWidth={1.3} />
               </Button>
             </div>
             <nav className="flex flex-col gap-2 items-end px-8 pb-6 text-base font-light mt-12">
@@ -85,7 +85,7 @@ export default function SidebarNav() {
                 <span
                   className={cn(
                     "link-underline",
-                    pathname === "/" && "link-underline-active"
+                    pathname === "/" && "link-underline-active",
                   )}
                 >
                   home
@@ -101,7 +101,7 @@ export default function SidebarNav() {
                   <span
                     className={cn(
                       "link-underline",
-                      pathname === link.href && "link-underline-active"
+                      pathname === link.href && "link-underline-active",
                     )}
                   >
                     {link.label}

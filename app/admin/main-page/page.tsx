@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic"
 type HeroMediaSettings = {
   url: string | null
   animationEnabled: boolean | null
+  caption: string | null
 }
 
 const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
@@ -21,13 +22,13 @@ const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
       .maybeSingle()
 
     if (siteContentError) {
-      return { url: null, animationEnabled: null }
+      return { url: null, animationEnabled: null, caption: null }
     }
 
     if (siteContent?.hero_asset_id) {
       const { data: asset, error: assetError } = await supabase
         .from("assets")
-        .select("path")
+        .select("path, caption")
         .eq("id", siteContent.hero_asset_id)
         .maybeSingle()
 
@@ -35,6 +36,7 @@ const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
         return {
           url: null,
           animationEnabled: siteContent.hero_animation_enabled ?? null,
+          caption: asset?.caption ?? null,
         }
       }
 
@@ -49,6 +51,7 @@ const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
       return {
         url: data.publicUrl ? `${data.publicUrl}${versionTag}` : null,
         animationEnabled: siteContent.hero_animation_enabled ?? null,
+        caption: asset.caption ?? null,
       }
     }
 
@@ -61,7 +64,7 @@ const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
       .maybeSingle()
 
     if (fallbackError || !fallbackAsset?.path) {
-      return { url: null, animationEnabled: null }
+      return { url: null, animationEnabled: null, caption: null }
     }
 
     const { data } = supabase.storage
@@ -75,22 +78,27 @@ const fetchHeroSettings = async (): Promise<HeroMediaSettings> => {
     return {
       url: data.publicUrl ? `${data.publicUrl}${versionTag}` : null,
       animationEnabled: null,
+      caption: null,
     }
   } catch (error) {
     console.error("Failed to load hero image", { error })
-    return { url: null, animationEnabled: null }
+    return { url: null, animationEnabled: null, caption: null }
   }
 }
 
 export default async function AdminMainPage() {
-  const { url: heroImageUrl, animationEnabled: heroAnimationEnabled } =
-    await fetchHeroSettings()
+  const {
+    url: heroImageUrl,
+    animationEnabled: heroAnimationEnabled,
+    caption: heroCaption,
+  } = await fetchHeroSettings()
 
   return (
     <div className="space-y-6">
       <AdminMainImagePreviewPanel
         heroImageUrl={heroImageUrl}
         heroAnimationEnabled={heroAnimationEnabled}
+        heroCaption={heroCaption}
       />
 
       <Card className="border-0 bg-muted shadow-none">

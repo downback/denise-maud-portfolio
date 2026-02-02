@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react"
 import BioUploadModal from "@/components/admin/BioUploadModal"
+import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -31,6 +32,8 @@ export default function AdminBioSectionPanel({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [formValues, setFormValues] = useState({
     year: "",
     title: "",
@@ -206,17 +209,17 @@ export default function AdminBioSectionPanel({
     }
   }
 
-  const handleDelete = async (item: BioItem) => {
-    if (!hasValidId(item.id)) {
+  const handleDelete = async (id: string) => {
+    if (!hasValidId(id)) {
       setErrorMessage("This entry is missing an id. Refresh the page.")
       return
     }
-    console.log("Deleting bio entry", { id: item.id, kind })
+    console.log("Deleting bio entry", { id, kind })
     setIsSubmitting(true)
     setErrorMessage("")
 
     try {
-      const safeId = encodeURIComponent(normalizeId(item.id))
+      const safeId = encodeURIComponent(normalizeId(id))
       const response = await fetch(`/api/admin/bio/${kind}/${safeId}`, {
         method: "DELETE",
       })
@@ -229,7 +232,7 @@ export default function AdminBioSectionPanel({
       }
 
       setCurrentItems((prevItems) =>
-        prevItems.filter((entry) => entry.id !== item.id)
+        prevItems.filter((entry) => entry.id !== id)
       )
     } catch (error) {
       console.error("Failed to delete bio entry", { error })
@@ -237,6 +240,25 @@ export default function AdminBioSectionPanel({
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const openDeleteDialog = (item: BioItem) => {
+    if (!hasValidId(item.id)) {
+      setErrorMessage("This entry is missing an id. Refresh the page.")
+      return
+    }
+    setDeleteTargetId(normalizeId(item.id))
+    setIsDeleteOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) {
+      setIsDeleteOpen(false)
+      return
+    }
+    await handleDelete(deleteTargetId)
+    setDeleteTargetId(null)
+    setIsDeleteOpen(false)
   }
 
   const persistOrder = async (nextItems: BioItem[]) => {
@@ -331,17 +353,31 @@ export default function AdminBioSectionPanel({
               >
                 <Pencil className="h-3 w-3 md:h-4 md:w-4 hover:text-zinc-400" />
               </Button>
-              <Button
-                type="button"
-                variant="default"
-                size="icon"
-                aria-label="Delete"
-                className="shadow-none"
-                onClick={() => handleDelete(item)}
+              <DeleteConfirmDialog
+                open={isDeleteOpen && deleteTargetId === item.id}
+                isDeleting={isSubmitting}
+                onOpenChange={(open) => {
+                  setIsDeleteOpen(open)
+                  if (!open) setDeleteTargetId(null)
+                }}
+                onConfirm={handleConfirmDelete}
                 disabled={!hasValidId(item.id)}
-              >
-                <Trash2 className="h-3 w-3 md:h-4 md:w-4 text-red-500 hover:text-red-300" />
-              </Button>
+                title="Delete this entry?"
+                description="This action cannot be undone."
+                trigger={
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="icon"
+                    aria-label="Delete"
+                    className="shadow-none"
+                    onClick={() => openDeleteDialog(item)}
+                    disabled={!hasValidId(item.id)}
+                  >
+                    <Trash2 className="h-3 w-3 md:h-4 md:w-4 text-red-500 hover:text-red-300" />
+                  </Button>
+                }
+              />
             </div>
           </div>
         ))}
