@@ -65,11 +65,11 @@ export default function SidebarNav() {
       {isMobileNavOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-xs md:hidden"
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-xs md:hidden min-h-dvh"
             onClick={closeMobileNav}
             aria-hidden="true"
           />
-          <aside className="fixed right-0 top-0 z-50 h-full w-1/2 bg-white border-l border-border text-right md:hidden">
+          <aside className="fixed right-0 top-0 min-h-dvh z-50 h-full w-1/2 bg-white border-l border-border text-right md:hidden">
             <div className="flex justify-end px-4 py-4">
               <Button
                 variant="default"
