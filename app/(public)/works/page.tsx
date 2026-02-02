@@ -105,11 +105,11 @@ export default function Works() {
       {isLoading ? (
         <Loading message="Loading portfolio..." />
       ) : pdfUrl ? (
-        <div className="h-[75vh] md:h-[80vh] overflow-hidden rounded border border-black">
+        <div className="h-[75vh] md:h-[80vh] overflow-auto rounded border border-black touch-pan-y">
           <iframe
             title="Portfolio PDF"
-            src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH`}
-            className="h-full w-full"
+            src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH&zoom=page-width`}
+            className="block h-full w-full"
             loading="lazy"
           />
         </div>
