@@ -84,7 +84,7 @@ export default function Works() {
           {pdfUrl ? (
             <>
               <a
-                className="hidden sm:block text-sm font-normal text-primary underline underline-offset-4"
+                className="hidden sm:inline-block link-underline text-sm font-normal text-primary"
                 href={pdfUrl}
                 target="_blank"
                 rel="noreferrer"
@@ -92,7 +92,7 @@ export default function Works() {
                 Open portfolio PDF in new tab
               </a>
               <a
-                className="block sm:hidden text-sm font-normal text-primary underline underline-offset-4"
+                className="inline-block sm:hidden link-underline text-sm font-normal text-primary"
                 href={pdfUrl}
                 target="_blank"
                 rel="noreferrer"

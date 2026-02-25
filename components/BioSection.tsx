@@ -46,19 +46,19 @@ const renderYear = (year: string) => {
 export default function BioSection({ title, items }: BioSectionProps) {
   return (
     <section className="group flex flex-col gap-4 lg:flex-row">
-      <h2 className="w-full text-sm md:w-xs md:text-base font-light">
-        <span className="link-underline inline-block">{title}</span>
+      <h2 className="w-full text-[14px] md:w-xs md:text-base font-light">
+        <span className="link-underline link-underline-mobile">{title}</span>
       </h2>
-      <ul className="space-y-3 md:space-y-3">
+      <ul className="space-y-2 md:space-y-3">
         {items.map((item, index) => (
           <div
             key={index}
             className="flex w-full h-fit items-center sm:items-start flex-row-reverse justify-between md:w-xl md:flex-col"
           >
-            <h3 className="text-right sm:text-left text-sm  min-w-14 sm:flex-1 ml-4 sm:ml-0 ">
+            <h3 className="text-right sm:text-left text-xs min-w-14 sm:flex-1 ml-4 sm:ml-0 ">
               {renderYear(item.year)}
             </h3>
-            <p className="text-base  flex-auto">{item.description}</p>
+            <p className="text-[14px] flex-auto">{item.description}</p>
           </div>
         ))}
       </ul>
