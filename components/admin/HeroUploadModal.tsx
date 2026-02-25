@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AdminDialog from "@/components/admin/AdminDialog"
 
 type HeroUploadModalProps = {
   open: boolean
@@ -50,14 +51,38 @@ export default function HeroUploadModal({
   const [selectedImageName, setSelectedImageName] = useState("")
   const [imagePreviewUrl, setImagePreviewUrl] = useState("")
   const [isAnimationEnabled, setIsAnimationEnabled] = useState(animationEnabled)
+  const [isSizeErrorOpen, setIsSizeErrorOpen] = useState(false)
+  const [sizeErrorMessage, setSizeErrorMessage] = useState("")
+
+  const maxImageSizeBytes = 1.5 * 1024 * 1024
+
+  const handleImageSelection = (file: File | null) => {
+    if (!file) {
+      setSelectedImageName("")
+      setImagePreviewUrl("")
+      onImageSelect?.(null)
+      return
+    }
+
+    if (file.size > maxImageSizeBytes) {
+      setSelectedImageName("")
+      setImagePreviewUrl("")
+      onImageSelect?.(null)
+      setSizeErrorMessage("Hero images must be under 1.5 MB.")
+      setIsSizeErrorOpen(true)
+      return
+    }
+
+    setSelectedImageName(file.name)
+    setImagePreviewUrl(URL.createObjectURL(file))
+    onImageSelect?.(file)
+  }
 
   const handleImageDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault()
     const file = event.dataTransfer.files?.[0]
     if (file) {
-      setSelectedImageName(file.name)
-      setImagePreviewUrl(URL.createObjectURL(file))
-      onImageSelect?.(file)
+      handleImageSelection(file)
     }
   }
 
@@ -86,7 +111,8 @@ export default function HeroUploadModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md md:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -117,12 +143,8 @@ export default function HeroUploadModal({
               accept="image/*"
               className="sr-only"
               onChange={(event) => {
-                const file = event.target.files?.[0]
-                if (file) {
-                  setSelectedImageName(file.name)
-                  setImagePreviewUrl(URL.createObjectURL(file))
-                  onImageSelect?.(file)
-                }
+                const file = event.target.files?.[0] ?? null
+                handleImageSelection(file)
               }}
             />
             {imagePreviewUrl ? (
@@ -185,7 +207,15 @@ export default function HeroUploadModal({
             {isSubmitting ? "Saving..." : confirmLabel}
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <AdminDialog
+        open={isSizeErrorOpen}
+        onOpenChange={setIsSizeErrorOpen}
+        title="File too large"
+        description={sizeErrorMessage}
+        confirmLabel="OK"
+      />
+    </>
   )
 }

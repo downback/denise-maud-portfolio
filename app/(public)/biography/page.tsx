@@ -48,7 +48,7 @@ export default async function Bio() {
   const selectedGroupShows = formatBioItems(groupRows ?? [])
 
   return (
-    <div className="space-y-10 font-light pt-6 md:pt-30">
+    <div className="space-y-10 font-light pt-6 md:pt-30 mb-16 md:mb-20">
       <BioSection title="solo shows" items={soloShows} />
       <BioSection title="selected group shows" items={selectedGroupShows} />
       <BioSection title="education" items={education} />

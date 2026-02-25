@@ -105,7 +105,7 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
     <div className="fixed inset-0 md:relative -z-10">
       <div className="flex items-center justify-center w-full min-h-screen md:min-h-screen">
         <div
-          className={`w-[80vw] h-auto md:w-auto md:h-[70vh]  ${
+          className={`w-[80vw] h-auto md:w-auto md:h-[70vh] -translate-y-4 ${
             isAnimationEnabled ? "hero-float" : ""
           }`}
         >

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AdminDialog from "@/components/admin/AdminDialog"
 
 type WorkUploadModalProps = {
   open: boolean
@@ -39,6 +40,29 @@ export default function WorkUploadModal({
   errorMessage,
 }: WorkUploadModalProps) {
   const [selectedFileName, setSelectedFileName] = useState("")
+  const [isSizeErrorOpen, setIsSizeErrorOpen] = useState(false)
+  const [sizeErrorMessage, setSizeErrorMessage] = useState("")
+
+  const maxPdfSizeBytes = 10 * 1024 * 1024
+
+  const handleFileSelection = (file: File | null) => {
+    if (!file) {
+      setSelectedFileName("")
+      onFileSelect?.(null)
+      return
+    }
+
+    if (file.size > maxPdfSizeBytes) {
+      setSelectedFileName("")
+      onFileSelect?.(null)
+      setSizeErrorMessage("Work PDFs must be under 10 MB.")
+      setIsSizeErrorOpen(true)
+      return
+    }
+
+    setSelectedFileName(file.name)
+    onFileSelect?.(file)
+  }
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
@@ -50,7 +74,8 @@ export default function WorkUploadModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md md:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -66,8 +91,7 @@ export default function WorkUploadModal({
               accept=".pdf"
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null
-                setSelectedFileName(file?.name ?? "")
-                onFileSelect?.(file)
+                handleFileSelection(file)
               }}
             />
             {selectedFileName ? (
@@ -98,7 +122,15 @@ export default function WorkUploadModal({
             {isSubmitting ? "Saving..." : confirmLabel}
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <AdminDialog
+        open={isSizeErrorOpen}
+        onOpenChange={setIsSizeErrorOpen}
+        title="File too large"
+        description={sizeErrorMessage}
+        confirmLabel="OK"
+      />
+    </>
   )
 }

@@ -62,7 +62,7 @@ export default async function AdminWorks() {
               Use a single PDF file and recommend name it
               &quot;portfolio.pdf&ldquo;
             </li>
-            <li>Recommended size: under 15MB for fast loading.</li>
+            <li>Recommended size: under 5MB for fast loading(maximum 10MB)</li>
           </ul>
         </CardContent>
       </Card>

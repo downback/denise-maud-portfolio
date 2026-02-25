@@ -4,8 +4,8 @@ export default function Contact() {
       <section className="flex flex-col gap-4 md:flex-row">
         <h2 className="w-full text-sm md:w-xs md:text-base">email</h2>
         <p className="text-base">
-          <a href="mailto:denise@example.com" className="link-underline">
-            denise@example.com
+          <a href="mailto:denise.aschmann@gmail.com" className="link-underline">
+            denise.aschmann@gmail.com
           </a>
         </p>
       </section>

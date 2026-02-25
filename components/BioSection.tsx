@@ -45,9 +45,9 @@ const renderYear = (year: string) => {
 
 export default function BioSection({ title, items }: BioSectionProps) {
   return (
-    <section className="flex flex-col gap-4 lg:flex-row">
+    <section className="group flex flex-col gap-4 lg:flex-row">
       <h2 className="w-full text-sm md:w-xs md:text-base font-light">
-        {title}
+        <span className="link-underline inline-block">{title}</span>
       </h2>
       <ul className="space-y-3 md:space-y-3">
         {items.map((item, index) => (
