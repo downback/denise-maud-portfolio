@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import AdminQuickPreviewPanel from "@/components/admin/AdminQuickPreviewPanel"
 import AdminRecentActivityPanel from "@/components/admin/AdminRecentActivityPanel"
 import { supabaseServer } from "@/lib/server"
