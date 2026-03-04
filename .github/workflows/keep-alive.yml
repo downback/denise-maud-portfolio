@@ -12,4 +12,3 @@ jobs:
       - name: Ping Supabase via API route
         run: |
           curl --fail https://www.denisemaud.ch/api/ping
-```
