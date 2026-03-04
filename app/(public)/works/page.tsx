@@ -10,9 +10,10 @@ export default function Works() {
 
   // Fetcher function for SWR
   const fetcher = async () => {
+    // FIX 1: Single query with join instead of two sequential queries
     const { data: siteContent, error: siteContentError } = await supabase
       .from("site_content")
-      .select("works_pdf_asset_id, updated_at")
+      .select("updated_at, assets!works_pdf_asset_id ( path )")
       .eq("singleton_id", true)
       .maybeSingle()
 
@@ -20,28 +21,29 @@ export default function Works() {
       return null
     }
 
-    if (siteContent?.works_pdf_asset_id) {
-      const { data: asset, error: assetError } = await supabase
-        .from("assets")
-        .select("path")
-        .eq("id", siteContent.works_pdf_asset_id)
-        .maybeSingle()
+    if (siteContent?.assets) {
+      const asset = Array.isArray(siteContent.assets)
+        ? siteContent.assets[0]
+        : siteContent.assets
 
-      if (assetError || !asset?.path) {
-        return null
-      }
+      if (!asset?.path) return null
 
       const { data } = supabase.storage
         .from("site-assets")
         .getPublicUrl(asset.path)
 
-      const versionTag = siteContent.updated_at
-        ? `?v=${encodeURIComponent(siteContent.updated_at)}`
-        : ""
+      if (!data?.publicUrl) return null
 
-      return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
+      // FIX 2: Correctly append version tag — use & if URL already has query params
+      if (siteContent.updated_at) {
+        const separator = data.publicUrl.includes("?") ? "&" : "?"
+        return `${data.publicUrl}${separator}v=${encodeURIComponent(siteContent.updated_at)}`
+      }
+
+      return data.publicUrl
     }
 
+    // Fallback: query assets table directly
     const { data: fallbackAsset, error: fallbackError } = await supabase
       .from("assets")
       .select("path, created_at")
@@ -58,21 +60,24 @@ export default function Works() {
       .from("site-assets")
       .getPublicUrl(fallbackAsset.path)
 
-    const versionTag = fallbackAsset.created_at
-      ? `?v=${encodeURIComponent(fallbackAsset.created_at)}`
-      : ""
+    if (!data?.publicUrl) return null
 
-    return data?.publicUrl ? `${data.publicUrl}${versionTag}` : null
+    // FIX 2: Same version tag fix applied to fallback path
+    if (fallbackAsset.created_at) {
+      const separator = data.publicUrl.includes("?") ? "&" : "?"
+      return `${data.publicUrl}${separator}v=${encodeURIComponent(fallbackAsset.created_at)}`
+    }
+
+    return data.publicUrl
   }
 
-  // Use SWR with aggressive caching
   const { data: pdfUrl, isLoading } = useSWR<string | null>(
     "portfolio-pdf",
     fetcher,
     {
-      revalidateOnFocus: false, // Don't refetch on window focus
-      revalidateOnReconnect: false, // Don't refetch on reconnect
-      dedupingInterval: 3600000, // Dedupe requests within 1 hour
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 3600000,
       fallbackData: null,
     },
   )
@@ -119,6 +124,7 @@ export default function Works() {
         <Loading message="Loading portfolio..." />
       ) : pdfUrl ? (
         <>
+          {/* Desktop: native iframe PDF */}
           <div className="hidden md:block h-[80vh] overflow-auto rounded border border-black">
             <iframe
               title="Portfolio PDF"
@@ -128,7 +134,8 @@ export default function Works() {
             />
           </div>
 
-          <div className="block md:hidden h-[75vh] overflow-auto rounded border border-black touch-pan-y">
+          {/* Mobile: Google Docs Viewer — FIX 3: removed touch-pan-y to allow horizontal scroll */}
+          <div className="block md:hidden h-[75vh] overflow-auto rounded border border-black">
             <iframe
               title="Portfolio PDF"
               src={`https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`}
