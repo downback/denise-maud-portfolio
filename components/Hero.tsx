@@ -93,8 +93,8 @@ export default function Hero({ alt = "Hero image" }: HeroProps) {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 md:relative -z-10">
-        <Loading message="Loading image..." height="h-screen md:h-[70vh]" />
+      <div className="fixed inset-0 md:relative -z-10 ">
+        <Loading message="Loading image..." height="h-screen" />
       </div>
     )
   }
