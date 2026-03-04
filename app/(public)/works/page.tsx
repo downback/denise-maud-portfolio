@@ -98,7 +98,7 @@ export default function Works() {
                   Open portfolio PDF in new tab
                 </a>
                 <a
-                  className="inline-block sm:hidden underline underline-offset-4 text-sm font-normal text-primary"
+                  className="inline-block sm:hidden text-sm font-normal text-primary"
                   href={pdfUrl}
                   target="_blank"
                   rel="noreferrer"

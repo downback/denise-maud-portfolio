@@ -161,7 +161,7 @@
   transform: translateY(-50%) scaleX(1);
 }
 
-.link-underline-mobile::after {
+/* .link-underline-mobile::after {
   content: "";
   position: absolute;
   top: 90%;
@@ -172,7 +172,7 @@
   transform-origin: left;
   background-color: black;
   transition: transform 300ms ease-in-out;
-}
+} */
 
 @media (max-width: 767px) {
   .link-underline-mobile::after {

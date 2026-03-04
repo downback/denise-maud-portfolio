@@ -4,7 +4,10 @@ export default function Contact() {
       <section className="flex flex-col gap-4 md:flex-row">
         <h2 className="w-full text-sm md:w-xs md:text-base">email</h2>
         <p className="text-base">
-          <a href="mailto:denise.aschmann@gmail.com" className="link-underline">
+          <a
+            href="mailto:denise.aschmann@gmail.com"
+            className="md:link-underline"
+          >
             denise.aschmann@gmail.com
           </a>
         </p>
@@ -17,7 +20,7 @@ export default function Contact() {
             href="https://instagram.com/denise.maud"
             target="_blank"
             rel="noopener noreferrer"
-            className="link-underline"
+            className="md:link-underline"
           >
             @denise.maud
           </a>
