@@ -79,7 +79,7 @@ export default function SidebarNav() {
       </aside>
 
       {/* Mobile Header */}
-      <header className="flex md:hidden items-center justify-between border-b border-border px-2 py-2 backdrop-blur-sm">
+      <header className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between border-b border-border px-2 py-2 backdrop-blur-sm">
         <Link
           className="text-base font-normal pl-2"
           href="/"

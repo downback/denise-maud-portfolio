@@ -14,12 +14,12 @@ export default function Contact() {
         <h2 className="w-full text-sm md:w-xs md:text-base">instagram</h2>
         <p className="text-base">
           <a
-            href="https://instagram.com/denisemaud"
+            href="https://instagram.com/denise.maud"
             target="_blank"
             rel="noopener noreferrer"
             className="link-underline"
           >
-            @denisemaud
+            @denise.maud
           </a>
         </p>
       </section>

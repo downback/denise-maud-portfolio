@@ -78,7 +78,7 @@ export default function Works() {
   )
 
   return (
-    <div className="space-y-6 md:space-y-4 translate-y-0 md:-translate-y-9 pt-6 md:pt-30">
+    <div className="space-y-8 md:space-y-4 translate-y-0 md:-translate-y-9 pt-6 md:pt-30">
       <div className="space-y-2">
         <div className="flex flex-row justify-center md:justify-end">
           {pdfUrl ? (
@@ -92,7 +92,7 @@ export default function Works() {
                 Open portfolio PDF in new tab
               </a>
               <a
-                className="inline-block sm:hidden link-underline text-sm font-normal text-primary"
+                className="inline-block sm:hidden underline underline-offset-4 text-sm font-normal text-primary"
                 href={pdfUrl}
                 target="_blank"
                 rel="noreferrer"
@@ -114,14 +114,27 @@ export default function Works() {
       {isLoading ? (
         <Loading message="Loading portfolio..." />
       ) : pdfUrl ? (
-        <div className="h-[75vh] md:h-[80vh] overflow-auto rounded border border-black touch-pan-y">
-          <iframe
-            title="Portfolio PDF"
-            src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH&zoom=page-width`}
-            className="block h-full w-full"
-            loading="lazy"
-          />
-        </div>
+        <>
+          {/* Desktop: iframe works fine */}
+          <div className="hidden md:block h-[80vh] overflow-auto rounded border border-black">
+            <iframe
+              title="Portfolio PDF"
+              src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH`}
+              className="block h-full w-full"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Mobile: iframe is unreliable on Safari — use Google Docs viewer */}
+          <div className="block md:hidden h-[75vh] overflow-auto rounded border border-black touch-pan-y">
+            <iframe
+              title="Portfolio PDF"
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`}
+              className="block h-full w-full"
+              loading="lazy"
+            />
+          </div>
+        </>
       ) : (
         <div className="flex h-[45vh] items-center justify-center rounded border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
           No portfolio PDF available
