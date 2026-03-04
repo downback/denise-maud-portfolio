@@ -105,7 +105,7 @@ export default function SidebarNav() {
             onClick={closeMobileNav}
             aria-hidden="true"
           />
-          <aside className="fixed overflow-hidden right-0 top-0 z-50 h-svh min-h-svh w-1/2 bg-white border-l border-border text-right md:hidden">
+          <aside className="fixed overflow-hidden right-0 top-0 z-50 h-svh min-h-svh w-3/5 bg-white text-right md:hidden">
             <div className="flex justify-end px-4 py-4">
               <Button
                 variant="default"

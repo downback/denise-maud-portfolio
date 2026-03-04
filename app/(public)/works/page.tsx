@@ -80,42 +80,45 @@ export default function Works() {
   return (
     <div className="space-y-8 md:space-y-4 translate-y-0 md:-translate-y-9 pt-6 md:pt-30">
       <div className="space-y-2">
-        <div className="flex flex-row justify-center md:justify-end">
+        <div>
           {pdfUrl ? (
             <>
-              <a
-                className="hidden sm:inline-block link-underline text-sm font-normal text-primary"
-                href={pdfUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open portfolio PDF in new tab
-              </a>
-              <a
-                className="inline-block sm:hidden underline underline-offset-4 text-sm font-normal text-primary"
-                href={pdfUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open portfolio in new tab
-              </a>
+              <div className="flex flex-row justify-center md:justify-end mb-2">
+                <a
+                  className="hidden sm:inline-block link-underline text-sm font-normal text-primary"
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open portfolio PDF in new tab
+                </a>
+                <a
+                  className="inline-block sm:hidden underline underline-offset-4 text-sm font-normal text-primary"
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open portfolio in new tab
+                </a>
+              </div>
+              <p className="text-xs leading-none text-center text-muted-foreground block md:hidden">
+                You can view or download the full portfolio PDF
+              </p>
             </>
           ) : (
-            <span className="text-sm font-normal text-muted-foreground">
-              Portfolio PDF not available yet
-            </span>
+            <div className="flex flex-row justify-center md:justify-end">
+              <span className="text-sm font-normal text-muted-foreground">
+                Portfolio PDF not available yet
+              </span>
+            </div>
           )}
         </div>
-        <p className="text-xs leading-none text-center text-muted-foreground block md:hidden">
-          You can view or download the full portfolio PDF
-        </p>
       </div>
 
       {isLoading ? (
         <Loading message="Loading portfolio..." />
       ) : pdfUrl ? (
         <>
-          {/* Desktop: iframe works fine */}
           <div className="hidden md:block h-[80vh] overflow-auto rounded border border-black">
             <iframe
               title="Portfolio PDF"
@@ -125,7 +128,6 @@ export default function Works() {
             />
           </div>
 
-          {/* Mobile: iframe is unreliable on Safari — use Google Docs viewer */}
           <div className="block md:hidden h-[75vh] overflow-auto rounded border border-black touch-pan-y">
             <iframe
               title="Portfolio PDF"
